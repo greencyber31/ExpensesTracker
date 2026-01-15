@@ -1,7 +1,8 @@
-const CACHE_NAME = 'expenses-tracker-v2';
+const CACHE_NAME = 'expenses-tracker-v3';
 const ASSETS = [
     './',
     './index.html',
+    './Expenses_tracker.html',
     './sw.js'
 ];
 

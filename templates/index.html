@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Expense Tracker</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        select,
+        input,
+        button {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+            border-top: 2px solid #eee;
+            pt: 10px;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tag {
+            font-size: 0.8rem;
+            background: #e2e2e2;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>Daily Food Expenses</h2>
+
+        <form action="/add" method="POST">
+            <select name="meal_type">
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Snack">Snack</option>
+            </select>
+            <input type="text" name="item_name" placeholder="What did you eat?" required>
+            <input type="number" name="amount" step="0.01" placeholder="Cost ($)" required>
+            <button type="submit">Add Expense</button>
+        </form>
+
+        <div id="list">
+            {% for item in expenses %}
+            <div class="expense-item">
+                <span><span class="tag">{{ item.meal_type }}</span> {{ item.item_name }}</span>
+                <span>${{ "%.2f"|format(item.amount) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="total">Total: ${{ "%.2f"|format(total) }}</div>
+        <br>
+        <a href="/download_csv"
+            style="color: #007bff; text-decoration: none; font-size: 0.9rem; margin-right: 15px;">Download CSV</a>
+        <a href="/clear" style="color: #dc3545; text-decoration: none; font-size: 0.9rem;">Clear All</a>
+    </div>
+</body>
+
+</html>

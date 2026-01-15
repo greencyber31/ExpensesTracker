@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Expenses Tracker</title>
+    <!-- PWA / Home Screen Settings -->
+    <meta name="theme-color" content="#28a745">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Expenses">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Icon (Green Box with Peso Sign) -->
+    <link rel="icon" type="image/svg+xml"
+        href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="%2328a745"/><text x="50%" y="55%" dominant-baseline="central" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="300" fill="white">₱</text></svg>'>
+    <link rel="apple-touch-icon"
+        href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="%2328a745"/><text x="50%" y="55%" dominant-baseline="central" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="300" fill="white">₱</text></svg>'>
+
+    <!-- Manifest (Data URI for Single File PWA) -->
+    <link rel="manifest"
+        href='data:application/manifest+json,{"name":"Expenses Tracker","short_name":"Expenses","start_url":".","display":"standalone","background_color":"#f4f4f9","theme_color":"#28a745","orientation":"portrait","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Crect width=%22512%22 height=%22512%22 rx=%22100%22 fill=%22%2328a745%22/%3E%3Ctext x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%22300%22 fill=%22white%22%3E₱%3C/text%3E%3C/svg%3E","type":"image/svg+xml","sizes":"512x512"}]}'>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            font-size: 16px;
+            /* Ensure base size is good */
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            /* iOS Safe Area Support */
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            /* Increased gap */
+            margin-bottom: 25px;
+        }
+
+        input:not([type="checkbox"]),
+        button,
+        select {
+            /* Added select just in case */
+            padding: 14px;
+            /* Bigger padding */
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 1.1rem;
+            /* Bigger font */
+            /* iOS Safari Resets */
+            -webkit-appearance: none;
+            appearance: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        input[type="checkbox"] {
+            /* Ensure checkboxes stay visible on iOS */
+            -webkit-appearance: checkbox;
+            appearance: checkbox;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        /* Category Buttons */
+        .category-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .cat-btn {
+            flex: 1;
+            min-width: 90px;
+            /* Slightly wider */
+            padding: 12px 5px;
+            /* Bigger touch target */
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 1rem;
+            color: #495057;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .cat-btn:hover {
+            background-color: #e2e6ea;
+        }
+
+        .cat-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            font-weight: bold;
+        }
+
+        button[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            /* Make it pop */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        button.cancel-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+            border-top: 2px solid #eee;
+            padding-top: 10px;
+        }
+
+        .date-header {
+            background-color: #e9ecef;
+            padding: 10px 14px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #495057;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            /* More padding */
+            border-bottom: 1px solid #eee;
+            background: #fff;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-info {
+            font-size: 0.85rem;
+            /* Slightly readable */
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .tag {
+            font-size: 0.85rem;
+            background: #e2e2e2;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 10px;
+            /* Space out buttons */
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.4rem;
+            /* Bigger icons */
+            padding: 5px 8px;
+            /* Touch target */
+            color: #666;
+        }
+
+        .delete-btn {
+            color: #dc3545;
+        }
+
+        .actions {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .action-group {
+            margin-bottom: 10px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .actions a,
+        .actions label {
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: #007bff;
+        }
+
+        .actions a:hover,
+        .actions label:hover {
+            text-decoration: underline;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .input-row {
+                flex-direction: column;
+            }
+
+            .input-row input {
+                flex: none !important;
+                width: 100%;
+            }
+
+            .item-left {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 2px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1
+                style="text-align: center; background-color: #28a745; color: white; padding: 15px; border-radius: 8px; margin-top: 0; margin-bottom: 20px; font-size: 1.8rem;">
+                Expenses Tracker</h1>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="food">Food</button>
+                <button class="tab-btn" data-tab="nonFood">General</button>
+            </div>
+
+            <h2 id="pageTitle">Daily Food Expenses</h2>
+
+            <form id="expenseForm">
+                <input type="hidden" id="editId">
+                <input type="hidden" id="category" value="">
+
+                <div id="categoryContainer" class="category-container">
+                    <!-- Buttons injected by JS -->
+                </div>
+
+                <div class="input-row">
+                    <input type="text" id="itemName" placeholder="Item Name" maxlength="50" required>
+                    <input type="number" id="amount" step="0.01" max="99999" placeholder="Cost (₱)" required>
+                    <input type="datetime-local" id="dateInput" style="color: #666;">
+                </div>
+                <small style="color: #888; font-size: 0.8rem; margin-top: -10px; margin-bottom: 5px;">Leave date blank
+                    to
+                    use current time</small>
+
+                <button type="submit" id="submitBtn">Add Expense</button>
+                <button type="button" id="cancelEditBtn" class="cancel-btn">Cancel Edit</button>
+            </form>
+
+            <div id="list"></div>
+
+            <div id="listControls"
+                style="display: flex; align-items: center; gap: 10px; margin-top: 15px; margin-bottom: 10px; padding: 8px 10px; background: #e9ecef; border-radius: 4px; display: none;">
+                <input type="checkbox" id="selectAllCheckbox" onchange="toggleAllEntries(this.checked)"
+                    style="width: 17px; height: 17px; cursor: pointer;">
+                <label for="selectAllCheckbox"
+                    style="font-weight: bold; color: #495057; cursor: pointer; font-size: 0.8rem;">Select
+                    All</label>
+            </div>
+
+            <div class="total" id="totalDisplay">Total: ₱0.00</div>
+
+            <div class="actions">
+                <div class="action-group">
+                    <a id="downloadBtn" style="display:none;">Download CSV</a>
+                    <a id="saveBtn">Save Data (CSV)</a>
+                    <label for="fileInput">Load Data (CSV)</label>
+                    <input type="file" id="fileInput" accept=".csv">
+                    <a onclick="showInstallInfo()" style="color: #28a745; cursor: pointer; font-weight: bold;">� Install
+                        as Mobile App</a>
+                </div>
+                <div class="action-group">
+                    <a id="clearBtn" style="color: #dc3545;">Clear Current List</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Install Modal -->
+        <div id="installModal"
+            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+            <div class="card" style="max-width:400px; width:100%; position:relative;">
+                <h2 style="color:#28a745;">Install App</h2>
+                <p>To use this as a standalone app (no browser bar):</p>
+                <div style="text-align:left; margin-bottom:20px;">
+                    <p><strong>📱 Android (Chrome):</strong><br>1. Tap the 3 dots <strong>(⋮)</strong>.<br>2. Select
+                        <strong>'Add to Home Screen'</strong>.
+                    </p>
+                    <p><strong>🍎 iPhone (Safari):</strong><br>1. Tap the Share icon <strong>(↑)</strong>.<br>2. Select
+                        <strong>'Add to Home Screen'</strong>.
+                    </p>
+                </div>
+                <button onclick="hideInstallInfo()"
+                    style="width:100%; background:#6c757d; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; margin-bottom:10px;">Got
+                    it!</button>
+                <button onclick="resetCache()"
+                    style="width:100%; background:none; color:#dc3545; border:1px solid #dc3545; padding:8px; border-radius:6px; cursor:pointer; font-size:0.8rem;">Reset
+                    App Cache (Fix Freezing)</button>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
+            Created by Carlos Rock Z. Diamante
+        </div>
+    </div>
+
+    <script>
+        // --- Error Steering ---
+        window.onerror = function (msg, url, lineNo, columnNo, error) {
+            alert('Error: ' + msg + '\nLine: ' + lineNo + '\nFile: ' + url);
+            return false;
+        };
+
+        // --- State ---
+        // Data Structure: { food: [], nonFood: [] }
+        let trackerData = { food: [], nonFood: [] };
+        let activeTab = 'food'; // 'food' or 'nonFood'
+
+        // --- Migration: Check for legacy data ---
+        const legacyData = localStorage.getItem('expenses');
+        const newData = localStorage.getItem('trackerData');
+
+        if (newData) {
+            try {
+                trackerData = JSON.parse(newData);
+            } catch (e) {
+                console.error("Data Parse Error", e);
+                alert("Warning: Saved data was corrupted and could not be loaded.");
+            }
+        } else if (legacyData) {
+            try {
+                // Migrate legacy array to food array
+                trackerData.food = JSON.parse(legacyData);
+                // Ensure IDs
+                trackerData.food = trackerData.food.map(ensureId);
+                localStorage.setItem('trackerData', JSON.stringify(trackerData));
+                localStorage.removeItem('expenses'); // Cleanup
+            } catch (e) { console.error("Legacy Parse Error", e); }
+        }
+
+        // --- Categories Config ---
+        const categories = {
+            food: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
+            nonFood: ['Transport', 'Shopping', 'Utilities', 'Other']
+        };
+
+        // --- DOM Elements ---
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const pageTitle = document.getElementById('pageTitle');
+        const catContainer = document.getElementById('categoryContainer');
+        const catInput = document.getElementById('category');
+        const listDiv = document.getElementById('list');
+        const listControls = document.getElementById('listControls');
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const totalDisplay = document.getElementById('totalDisplay');
+        const form = document.getElementById('expenseForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const editIdInput = document.getElementById('editId');
+        const itemNameInput = document.getElementById('itemName');
+        const amountInput = document.getElementById('amount');
+        const dateInput = document.getElementById('dateInput');
+
+        // --- Helpers ---
+        function ensureId(item) {
+            if (!item.id) item.id = Date.now() + Math.random().toString(16).slice(2);
+            return item;
+        }
+
+        function saveData() {
+            localStorage.setItem('trackerData', JSON.stringify(trackerData));
+        }
+
+        function getActiveList() {
+            return trackerData[activeTab];
+        }
+
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatTime(isoString) {
+            return new Date(isoString).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        }
+
+        function getDateKey(isoString) {
+            if (!isoString) return 'Unknown Date';
+            return new Date(isoString).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        // --- UI Logic ---
+        function switchTab(tab) {
+            activeTab = tab;
+
+            // Update Tab UI
+            tabBtns.forEach(btn => {
+                if (btn.dataset.tab === tab) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // Update Title
+            pageTitle.textContent = tab === 'food' ? "Daily Food Expenses" : "General Expenses";
+
+            // Render Category Buttons
+            renderCategoryButtons();
+
+            // Render List
+            renderList();
+
+            resetForm();
+        }
+
+        function renderCategoryButtons() {
+            catContainer.innerHTML = '';
+            const cats = categories[activeTab];
+
+            // Only override if current value is not valid for this tab
+            if (!cats.includes(catInput.value)) {
+                catInput.value = cats[0];
+            }
+
+            cats.forEach((cat, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                // Active if matches current value
+                btn.className = cat === catInput.value ? 'cat-btn active' : 'cat-btn';
+                btn.textContent = cat;
+                btn.onclick = () => selectCategory(cat, btn);
+                catContainer.appendChild(btn);
+            });
+        }
+
+        function selectCategory(cat, btnElement) {
+            catInput.value = cat;
+            Array.from(catContainer.children).forEach(b => b.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+            else {
+                // Find button by text if not passed directly
+                Array.from(catContainer.children).forEach(b => {
+                    if (b.textContent === cat) b.classList.add('active');
+                });
+            }
+        }
+
+        function formatCurrency(amount) {
+            return parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function renderList() {
+            const list = getActiveList();
+            listDiv.innerHTML = '';
+            let grandTotal = 0;
+
+            if (list.length === 0) {
+                listControls.style.display = 'none';
+                listDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">No entries yet.</div>';
+                totalDisplay.textContent = `Total: ₱${formatCurrency(0)}`;
+                return;
+            }
+
+            listControls.style.display = 'flex';
+            const allChecked = list.every(item => item.checked !== false);
+            selectAllCheckbox.checked = allChecked;
+
+            // Sort by date desc
+            const sorted = [...list].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Grouping
+            const grouped = {};
+            const uniqueKeys = [];
+
+            sorted.forEach(item => {
+                const key = getDateKey(item.date);
+                if (!grouped[key]) {
+                    grouped[key] = [];
+                    uniqueKeys.push(key);
+                }
+                grouped[key].push(item);
+            });
+
+            uniqueKeys.forEach(dateKey => {
+                const items = grouped[dateKey];
+                // Calculate Daily Total (Only Checked Items)
+                const dayTotal = items.reduce((sum, item) => {
+                    const isChecked = item.checked !== false;
+                    return isChecked ? sum + parseFloat(item.amount) : sum;
+                }, 0);
+
+                const header = document.createElement('div');
+                header.className = 'date-header';
+
+                // Check if all items for this day are checked
+                const allChecked = items.every(item => item.checked !== false);
+
+                header.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" 
+                            ${allChecked ? 'checked' : ''} 
+                            onchange="toggleDayCheck('${dateKey}', this.checked)"
+                            style="width: 24px; height: 24px; cursor: pointer;">
+                        <span>${dateKey}</span>
+                    </div>
+                    <span>₱${formatCurrency(dayTotal)}</span>
+                `;
+                listDiv.appendChild(header);
+
+                items.forEach(item => {
+                    const isChecked = item.checked !== false;
+                    const div = document.createElement('div');
+                    div.className = 'expense-item';
+                    div.style.opacity = isChecked ? '1' : '0.6';
+                    div.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" 
+                                ${isChecked ? 'checked' : ''} 
+                                onchange="toggleCheck('${item.id}')"
+                                style="width: 24px; height: 24px; cursor: pointer; margin-right: 5px;">
+                            <div class="item-info">
+                                <span><span class="tag">${item.category || item.meal_type}</span> ${item.item_name}</span>
+                                <span class="meta-info">${formatTime(item.date)}</span>
+                            </div>
+                        </div>
+                        <div class="item-left">
+                            <strong>₱${formatCurrency(item.amount)}</strong>
+                            <div class="item-actions">
+                                <button class="action-btn" onclick="startEdit('${item.id}')">✎</button>
+                                <button class="action-btn delete-btn" onclick="deleteItem('${item.id}')">×</button>
+                            </div>
+                        </div>
+                    `;
+                    listDiv.appendChild(div);
+                });
+                grandTotal += dayTotal;
+            });
+
+            totalDisplay.textContent = `Total: ₱${formatCurrency(grandTotal)}`;
+        }
+
+        window.toggleCheck = function (id) {
+            const list = getActiveList();
+            const item = list.find(x => x.id === id);
+            if (item) {
+                // Toggle state (default true if undefined)
+                item.checked = !(item.checked !== false);
+                saveData();
+                renderList();
+            }
+        };
+
+        window.toggleDayCheck = function (dateKey, isChecked) {
+            const list = getActiveList();
+            list.forEach(item => {
+                if (getDateKey(item.date) === dateKey) {
+                    item.checked = isChecked;
+                }
+            });
+            saveData();
+            renderList();
+        };
+
+        window.toggleAllEntries = function (isChecked) {
+            const list = getActiveList();
+            list.forEach(item => {
+                item.checked = isChecked;
+            });
+            saveData();
+            renderList();
+        };
+
+        // --- Actions ---
+        window.startEdit = function (id) {
+            const list = getActiveList();
+            const item = list.find(x => x.id === id);
+            if (item) {
+                editIdInput.value = item.id;
+                itemNameInput.value = item.item_name;
+                amountInput.value = item.amount;
+
+                // Set Date Input for Editing
+                if (item.date) {
+                    const d = new Date(item.date);
+                    // Format to local ISO: YYYY-MM-DDThh:mm
+                    // Simple trick to get local ISO string
+                    const localIso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                    dateInput.value = localIso;
+                } else {
+                    dateInput.value = '';
+                }
+
+                // Support legacy 'meal_type' or new 'category'
+                const cat = item.category || item.meal_type;
+                selectCategory(cat);
+
+                submitBtn.textContent = 'Update Expense';
+                submitBtn.style.backgroundColor = '#007bff';
+                cancelEditBtn.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        window.deleteItem = function (id) {
+            if (confirm('Delete this item?')) {
+                trackerData[activeTab] = trackerData[activeTab].filter(item => item.id !== id);
+                saveData();
+                renderList();
+                if (editIdInput.value === id) resetForm();
+            }
+        };
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = editIdInput.value;
+            const cat = catInput.value;
+            const name = itemNameInput.value;
+            const amt = parseFloat(amountInput.value);
+            const dateVal = dateInput.value;
+
+            if (name && amt > 0) {
+                // Determine Date: Use input if present, else current time
+                let finalDate;
+                if (dateVal) {
+                    finalDate = new Date(dateVal).toISOString();
+                } else {
+                    finalDate = new Date().toISOString();
+                }
+
+                if (id) {
+                    // Update
+                    const list = getActiveList();
+                    const item = list.find(x => x.id === id);
+                    if (item) {
+                        item.category = cat;
+                        if (item.meal_type) delete item.meal_type;
+                        item.item_name = name;
+                        item.amount = amt;
+                        item.date = finalDate; // Update date
+                    }
+                } else {
+                    // Create
+                    trackerData[activeTab].unshift({
+                        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                        category: cat,
+                        item_name: name,
+                        amount: amt,
+                        date: finalDate,
+                        checked: true
+                    });
+                }
+                saveData();
+                renderList();
+                resetForm();
+            }
+        });
+
+        function resetForm() {
+            const preservedCat = catInput.value;
+            form.reset();
+            editIdInput.value = '';
+            dateInput.value = ''; // Clear date input
+            // Restore category or select first if empty
+            selectCategory(preservedCat || categories[activeTab][0]);
+
+            submitBtn.textContent = 'Add Expense';
+            submitBtn.style.backgroundColor = '#28a745';
+            cancelEditBtn.style.display = 'none';
+        }
+
+        cancelEditBtn.addEventListener('click', resetForm);
+
+        // --- Global Features ---
+        // Tab Clicks
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        // Clear All (Active Tab Only)
+        document.getElementById('clearBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm(`Clear all ${activeTab === 'food' ? 'Food' : 'General'} expenses?`)) {
+                trackerData[activeTab] = [];
+                saveData();
+                renderList();
+            }
+        });
+
+        // Helper to escape CSV fields
+        function escapeCsv(field) {
+            if (field === null || field === undefined) return '';
+            const stringField = String(field);
+            if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
+                return `"${stringField.replace(/"/g, '""')}"`;
+            }
+            return stringField;
+        }
+
+        // Helper to parse CSV line
+        function parseCsvLine(line) {
+            const result = [];
+            let start = 0;
+            let insideQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                if (line[i] === '"') {
+                    insideQuotes = !insideQuotes;
+                } else if (line[i] === ',' && !insideQuotes) {
+                    let field = line.substring(start, i);
+                    if (field.startsWith('"') && field.endsWith('"')) {
+                        field = field.substring(1, field.length - 1).replace(/""/g, '"');
+                    }
+                    result.push(field);
+                    start = i + 1;
+                }
+            }
+            // Push last field
+            let field = line.substring(start);
+            if (field.startsWith('"') && field.endsWith('"')) {
+                field = field.substring(1, field.length - 1).replace(/""/g, '"');
+            }
+            result.push(field);
+            return result;
+        }
+
+        // Save Function (CSV)
+        document.getElementById('saveBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            // Added 'Included' column
+            const headers = ['Date', 'Type', 'Category', 'Item Name', 'Amount', 'ID', 'Included'];
+            const rows = [headers.join(',')];
+
+            // Process Food
+            trackerData.food.forEach(item => {
+                const row = [
+                    escapeCsv(item.date),
+                    'Food',
+                    escapeCsv(item.category || item.meal_type),
+                    escapeCsv(item.item_name),
+                    item.amount,
+                    item.id,
+                    item.checked !== false ? 'true' : 'false'
+                ];
+                rows.push(row.join(','));
+            });
+
+            // Process Non-Food
+            trackerData.nonFood.forEach(item => {
+                const row = [
+                    escapeCsv(item.date),
+                    'General',
+                    escapeCsv(item.category),
+                    escapeCsv(item.item_name),
+                    item.amount,
+                    item.id,
+                    item.checked !== false ? 'true' : 'false'
+                ];
+                rows.push(row.join(','));
+            });
+
+            const csvContent = rows.join('\n');
+
+            try {
+                if (window.showSaveFilePicker) {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: 'tracker_data.csv',
+                        types: [{ description: 'CSV Data', accept: { 'text/csv': ['.csv'] } }],
+                    });
+                    const writable = await handle.createWritable();
+                    await writable.write(csvContent);
+                    await writable.close();
+                    alert('All data saved to CSV!');
+                } else {
+                    downloadFile(csvContent, 'tracker_data.csv', 'text/csv');
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') downloadFile(csvContent, 'tracker_data.csv', 'text/csv');
+            }
+        });
+
+        function downloadFile(content, fileName, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Load Function (CSV)
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const text = ev.target.result;
+                    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+
+                    if (lines.length < 2) {
+                        alert('File seems empty or invalid.');
+                        return;
+                    }
+
+                    // Check Header
+                    const header = lines[0].split(',');
+
+                    if (confirm('Replace ALL data with this CSV file?')) {
+                        const newFood = [];
+                        const newNonFood = [];
+
+                        // Start from 1 to skip header
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = parseCsvLine(lines[i]);
+                            // Expected indices: 0:Date, 1:Type, 2:Cat, 3:Name, 4:Amt, 5:ID, 6:Included
+                            if (cols.length < 5) continue; // Skip malformed
+
+                            const item = {
+                                date: cols[0],
+                                category: cols[2],
+                                item_name: cols[3],
+                                amount: parseFloat(cols[4]),
+                                id: cols[5] || Date.now().toString(36) + Math.random().toString(36).substr(2),
+                                // Default true if col 6 missing (legacy CSV) or 'true'
+                                checked: (cols[6] === 'false') ? false : true
+                            };
+
+                            if (cols[1] === 'Food') {
+                                newFood.push(item);
+                            } else if (cols[1] === 'NonFood' || cols[1] === 'General') {
+                                newNonFood.push(item);
+                            } else {
+                                newFood.push(item);
+                            }
+                        }
+
+                        trackerData = { food: newFood, nonFood: newNonFood };
+                        saveData();
+                        renderList();
+                        alert('Data loaded successfully from CSV!');
+                    }
+                } catch (err) { alert('Error: ' + err.message); }
+                e.target.value = '';
+            };
+            reader.readAsText(file);
+        });
+
+        // Download CSV (Active Tab) - REMOVED since Save is now CSV
+        document.getElementById('downloadBtn').style.display = 'none';
+
+        // --- UI Modal ---
+        window.showInstallInfo = function () {
+            document.getElementById('installModal').style.display = 'flex';
+        };
+        window.hideInstallInfo = function () {
+            document.getElementById('installModal').style.display = 'none';
+        };
+
+        window.resetCache = function () {
+            if (confirm('This will refresh the app and clear any temporary system errors. Continue?')) {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(registrations => {
+                        for (let registration of registrations) { registration.unregister(); }
+                        caches.keys().then(names => {
+                            for (let name of names) { caches.delete(name); }
+                            window.location.reload(true);
+                        });
+                    });
+                } else {
+                    window.location.reload(true);
+                }
+            }
+        };
+
+        // Init
+        // Initialize UI with default tab
+        switchTab('food');
+
+        // --- Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+
+    </script>
+</body>
+
+</html>

@@ -185,6 +185,25 @@
             color: #495057;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .date-header:hover {
+            background-color: #dfe3e6;
+        }
+
+        .toggle-icon {
+            display: inline-block;
+            transition: transform 0.2s;
+            margin-right: 8px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .toggle-icon.collapsed {
+            transform: rotate(-90deg);
         }
 
         .expense-item {
@@ -447,7 +466,7 @@
         </div>
         <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
             Created by Carlos Rock Z. Diamante<br>
-            v1.5 (Updated: Jan 15, 10:46 AM)
+            v1.6 (Updated: Jan 15, 11:15 AM)
         </div>
     </div>
 
@@ -462,6 +481,7 @@
         // Data Structure: { food: [], nonFood: [] }
         let trackerData = { food: [], nonFood: [] };
         let activeTab = 'food'; // 'food' or 'nonFood'
+        let collapsedDays = new Set(); // Stores dateKeys of collapsed groups
 
         // --- Migration: Check for legacy data ---
         const legacyData = localStorage.getItem('expenses');
@@ -636,48 +656,53 @@
 
                 const header = document.createElement('div');
                 header.className = 'date-header';
+                const isCollapsed = collapsedDays.has(dateKey);
 
                 // Check if all items for this day are checked
                 const allChecked = items.every(item => item.checked !== false);
 
                 header.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="toggle-icon ${isCollapsed ? 'collapsed' : ''}" onclick="event.stopPropagation(); toggleDayCollapse('${dateKey}')">▾</span>
                         <input type="checkbox" 
                             ${allChecked ? 'checked' : ''} 
-                            onchange="toggleDayCheck('${dateKey}', this.checked)"
+                            onchange="event.stopPropagation(); toggleDayCheck('${dateKey}', this.checked)"
                             style="width: 24px; height: 24px; cursor: pointer;">
-                        <span>${dateKey}</span>
+                        <span onclick="toggleDayCollapse('${dateKey}')">${dateKey}</span>
                     </div>
                     <span>₱${formatCurrency(dayTotal)}</span>
                 `;
+                header.onclick = () => toggleDayCollapse(dateKey);
                 listDiv.appendChild(header);
 
-                items.forEach(item => {
-                    const isChecked = item.checked !== false;
-                    const div = document.createElement('div');
-                    div.className = 'expense-item';
-                    div.style.opacity = isChecked ? '1' : '0.6';
-                    div.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <input type="checkbox" 
-                                ${isChecked ? 'checked' : ''} 
-                                onchange="toggleCheck('${item.id}')"
-                                style="width: 24px; height: 24px; cursor: pointer; margin-right: 5px;">
-                            <div class="item-info">
-                                <span><span class="tag">${item.category || item.meal_type}</span> ${item.item_name}</span>
-                                <span class="meta-info">${formatTime(item.date)}</span>
+                if (!isCollapsed) {
+                    items.forEach(item => {
+                        const isChecked = item.checked !== false;
+                        const div = document.createElement('div');
+                        div.className = 'expense-item';
+                        div.style.opacity = isChecked ? '1' : '0.6';
+                        div.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" 
+                                    ${isChecked ? 'checked' : ''} 
+                                    onchange="toggleCheck('${item.id}')"
+                                    style="width: 24px; height: 24px; cursor: pointer; margin-right: 5px;">
+                                <div class="item-info">
+                                    <span><span class="tag">${item.category || item.meal_type}</span> ${item.item_name}</span>
+                                    <span class="meta-info">${formatTime(item.date)}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="item-left">
-                            <strong>₱${formatCurrency(item.amount)}</strong>
-                            <div class="item-actions">
-                                <button class="action-btn" onclick="startEdit('${item.id}')">✎</button>
-                                <button class="action-btn delete-btn" onclick="deleteItem('${item.id}')">×</button>
+                            <div class="item-left">
+                                <strong>₱${formatCurrency(item.amount)}</strong>
+                                <div class="item-actions">
+                                    <button class="action-btn" onclick="startEdit('${item.id}')">✎</button>
+                                    <button class="action-btn delete-btn" onclick="deleteItem('${item.id}')">×</button>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                    listDiv.appendChild(div);
-                });
+                        `;
+                        listDiv.appendChild(div);
+                    });
+                }
                 grandTotal += dayTotal;
             });
 
@@ -702,6 +727,15 @@
                 saveData();
                 renderList();
             }
+        };
+
+        window.toggleDayCollapse = function (dateKey) {
+            if (collapsedDays.has(dateKey)) {
+                collapsedDays.delete(dateKey);
+            } else {
+                collapsedDays.add(dateKey);
+            }
+            renderList();
         };
 
         window.toggleDayCheck = function (dateKey, isChecked) {

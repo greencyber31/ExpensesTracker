@@ -396,7 +396,11 @@
                     All</label>
             </div>
 
-            <div class="total" id="totalDisplay">Total: ₱0.00</div>
+            <div class="total-section" style="margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px;">
+                <div id="totalDisplay" style="font-size: 1.2rem; color: #666;">Subtotal: ₱0.00</div>
+                <div id="grandTotalDisplay" style="font-size: 1.6rem; font-weight: bold; color: #333; margin-top: 5px;">
+                    Grand Total: ₱0.00</div>
+            </div>
 
             <div class="actions">
                 <div class="btn-bar">
@@ -442,7 +446,7 @@
         </div>
         <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
             Created by Carlos Rock Z. Diamante<br>
-            v1.3 (Updated: Jan 15, 10:32 AM)
+            v1.4 (Updated: Jan 15, 10:42 AM)
         </div>
     </div>
 
@@ -676,7 +680,16 @@
                 grandTotal += dayTotal;
             });
 
-            totalDisplay.textContent = `Total: ₱${formatCurrency(grandTotal)}`;
+            totalDisplay.textContent = `Subtotal: ₱${formatCurrency(grandTotal)}`;
+
+            // Calculate Combined Grand Total (Across all tabs)
+            const globalTotal = ['food', 'nonFood'].reduce((total, tab) => {
+                return total + trackerData[tab].reduce((tabSum, item) => {
+                    return (item.checked !== false) ? tabSum + parseFloat(item.amount) : tabSum;
+                }, 0);
+            }, 0);
+
+            document.getElementById('grandTotalDisplay').textContent = `Grand Total: ₱${formatCurrency(globalTotal)}`;
         }
 
         window.toggleCheck = function (id) {

@@ -466,7 +466,7 @@
         </div>
         <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
             Created by Carlos Rock Z. Diamante<br>
-            v1.7 (Updated: Jan 15, 11:18 AM)
+            v1.8 (Updated: Jan 15, 11:21 AM)
         </div>
     </div>
 
@@ -675,7 +675,7 @@
                         <input type="checkbox" 
                             ${allChecked ? 'checked' : ''} 
                             onchange="event.stopPropagation(); toggleDayCheck('${dateKey}', this.checked)"
-                            style="width: 24px; height: 24px; cursor: pointer;">
+                            style="width: 19px; height: 19px; cursor: pointer;">
                         <span onclick="toggleDayCollapse('${dateKey}')">${dateKey}</span>
                     </div>
                     <span>₱${formatCurrency(dayTotal)}</span>
@@ -694,7 +694,7 @@
                                 <input type="checkbox" 
                                     ${isChecked ? 'checked' : ''} 
                                     onchange="toggleCheck('${item.id}')"
-                                    style="width: 24px; height: 24px; cursor: pointer; margin-right: 5px;">
+                                    style="width: 19px; height: 19px; cursor: pointer; margin-right: 5px;">
                                 <div class="item-info">
                                     <span><span class="tag">${item.category || item.meal_type}</span> ${item.item_name}</span>
                                     <span class="meta-info">${formatTime(item.date)}</span>

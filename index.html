@@ -466,7 +466,7 @@
         </div>
         <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
             Created by Carlos Rock Z. Diamante<br>
-            v1.6 (Updated: Jan 15, 11:15 AM)
+            v1.7 (Updated: Jan 15, 11:18 AM)
         </div>
     </div>
 
@@ -481,7 +481,15 @@
         // Data Structure: { food: [], nonFood: [] }
         let trackerData = { food: [], nonFood: [] };
         let activeTab = 'food'; // 'food' or 'nonFood'
-        let collapsedDays = new Set(); // Stores dateKeys of collapsed groups
+
+        // Persistent Collapsed State
+        let collapsedDays = new Set();
+        try {
+            const savedCollapsed = localStorage.getItem('collapsedDays');
+            if (savedCollapsed) {
+                collapsedDays = new Set(JSON.parse(savedCollapsed));
+            }
+        } catch (e) { console.error("Collapsed State Parse Error", e); }
 
         // --- Migration: Check for legacy data ---
         const legacyData = localStorage.getItem('expenses');
@@ -735,6 +743,8 @@
             } else {
                 collapsedDays.add(dateKey);
             }
+            // Save state
+            localStorage.setItem('collapsedDays', JSON.stringify([...collapsedDays]));
             renderList();
         };
 

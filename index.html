@@ -671,12 +671,13 @@
 
                 header.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <span class="toggle-icon ${isCollapsed ? 'collapsed' : ''}" onclick="event.stopPropagation(); toggleDayCollapse('${dateKey}')">▾</span>
+                        <span class="toggle-icon ${isCollapsed ? 'collapsed' : ''}">▾</span>
                         <input type="checkbox" 
                             ${allChecked ? 'checked' : ''} 
                             onchange="event.stopPropagation(); toggleDayCheck('${dateKey}', this.checked)"
+                            onclick="event.stopPropagation()"
                             style="width: 19px; height: 19px; cursor: pointer;">
-                        <span onclick="toggleDayCollapse('${dateKey}')">${dateKey}</span>
+                        <span>${dateKey}</span>
                     </div>
                     <span>₱${formatCurrency(dayTotal)}</span>
                 `;

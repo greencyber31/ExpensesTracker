@@ -270,6 +270,50 @@
             text-decoration: underline;
         }
 
+        /* Button Bar Styles */
+        .btn-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .bar-btn {
+            flex: 1;
+            padding: 12px 5px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-save {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-load {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #ddd;
+        }
+
+        .btn-more {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .bar-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
         #fileInput {
             display: none;
         }
@@ -355,16 +399,21 @@
             <div class="total" id="totalDisplay">Total: ₱0.00</div>
 
             <div class="actions">
-                <div class="action-group">
-                    <a id="downloadBtn" style="display:none;">Download CSV</a>
-                    <a id="saveBtn">Save Data (CSV)</a>
-                    <label for="fileInput">Load Data (CSV)</label>
-                    <input type="file" id="fileInput" accept=".csv">
-                    <a id="moreOptionsBtn" onclick="toggleMoreOptions()" style="color: #666; cursor: pointer;">Show More...</a>
+                <div class="btn-bar">
+                    <a id="saveBtn" class="bar-btn btn-save">💾 Save</a>
+                    <label for="fileInput" class="bar-btn btn-load">📂 Load</label>
+                    <a id="moreOptionsBtn" onclick="toggleMoreOptions()" class="bar-btn btn-more">⚙️ More</a>
                 </div>
-                <div id="moreOptionsGroup" class="action-group" style="display: none; border-top: 1px dashed #eee; padding-top: 10px; margin-top: 5px;">
-                    <a onclick="showInstallInfo()" style="color: #28a745; cursor: pointer; font-weight: bold;">u26a1 Install as Mobile App</a>
-                    <a id="clearBtn" style="color: #dc3545; cursor: pointer;">Clear Current List</a>
+                <!-- Hidden inputs -->
+                <a id="downloadBtn" style="display:none;">Download CSV</a>
+                <input type="file" id="fileInput" accept=".csv" style="display: none;">
+
+                <div id="moreOptionsGroup" class="action-group"
+                    style="display: none; border-top: 1px dashed #eee; padding-top: 15px; margin-top: 15px;">
+                    <a onclick="showInstallInfo()"
+                        style="color: #28a745; cursor: pointer; font-weight: bold; display: block; margin-bottom: 10px;">⚡
+                        Install as Mobile App</a>
+                    <a id="clearBtn" style="color: #dc3545; cursor: pointer; display: block;">🗑️ Clear Current List</a>
                 </div>
             </div>
         </div>
@@ -393,7 +442,7 @@
         </div>
         <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
             Created by Carlos Rock Z. Diamante<br>
-            v1.2 (Updated: Jan 15, 10:25 AM)
+            v1.3 (Updated: Jan 15, 10:32 AM)
         </div>
     </div>
 

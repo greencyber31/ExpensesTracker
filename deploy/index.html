@@ -360,11 +360,11 @@
                     <a id="saveBtn">Save Data (CSV)</a>
                     <label for="fileInput">Load Data (CSV)</label>
                     <input type="file" id="fileInput" accept=".csv">
-                    <a onclick="showInstallInfo()" style="color: #28a745; cursor: pointer; font-weight: bold;">� Install
-                        as Mobile App</a>
+                    <a id="moreOptionsBtn" onclick="toggleMoreOptions()" style="color: #666; cursor: pointer;">Show More...</a>
                 </div>
-                <div class="action-group">
-                    <a id="clearBtn" style="color: #dc3545;">Clear Current List</a>
+                <div id="moreOptionsGroup" class="action-group" style="display: none; border-top: 1px dashed #eee; padding-top: 10px; margin-top: 5px;">
+                    <a onclick="showInstallInfo()" style="color: #28a745; cursor: pointer; font-weight: bold;">u26a1 Install as Mobile App</a>
+                    <a id="clearBtn" style="color: #dc3545; cursor: pointer;">Clear Current List</a>
                 </div>
             </div>
         </div>
@@ -393,7 +393,7 @@
         </div>
         <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
             Created by Carlos Rock Z. Diamante<br>
-            v1.1 (Updated: Jan 15, 08:55 AM)
+            v1.2 (Updated: Jan 15, 10:25 AM)
         </div>
     </div>
 
@@ -962,6 +962,19 @@
                 } else {
                     window.location.reload(true);
                 }
+            }
+        };
+
+        // --- More Options Toggle ---
+        window.toggleMoreOptions = function () {
+            const group = document.getElementById('moreOptionsGroup');
+            const btn = document.getElementById('moreOptionsBtn');
+            if (group.style.display === 'none') {
+                group.style.display = 'flex';
+                btn.textContent = 'Hide Options';
+            } else {
+                group.style.display = 'none';
+                btn.textContent = 'Show More...';
             }
         };
 

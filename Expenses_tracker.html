@@ -728,6 +728,10 @@
                     <label style="font-weight: bold; color: #555;">Target Amount</label>
                     <input type="number" id="savingsTarget" step="0.01" placeholder="₱ 0.00" required>
 
+                    <label style="font-weight: bold; color: #555;">Description (Optional)</label>
+                    <textarea id="savingsDescription" placeholder="What are you saving for?"
+                        style="width: 100%; border: 1px solid #ccc; padding: 10px; border-radius: 4px; box-sizing: border-box; margin-bottom: 5px; font-family: inherit; resize: vertical; min-height: 60px;"></textarea>
+
                     <label style="font-weight: bold; color: #555;">Target Date</label>
                     <input type="date" id="savingsDate" required>
                 </div>
@@ -760,6 +764,13 @@
                             Date</span>
                         <span id="detailGoalDate" style="font-size: 1rem; font-weight: bold; color: #333;"></span>
                     </div>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <span
+                        style="display: block; font-size: 0.8rem; color: #888; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;">Description</span>
+                    <textarea id="detailDescription" placeholder="Add a description..."
+                        style="width: 100%; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; font-size: 0.95rem; font-family: inherit; resize: vertical; min-height: 50px; background: #fff; outline: none; color: #555;"></textarea>
                 </div>
 
                 <div style="background: #fff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px;">
@@ -906,6 +917,7 @@
         const savingsForm = document.getElementById('savingsForm');
         const savingsNameInput = document.getElementById('savingsName');
         const savingsTargetInput = document.getElementById('savingsTarget');
+        const savingsDescriptionInput = document.getElementById('savingsDescription');
         const savingsDateInput = document.getElementById('savingsDate');
         const savingsListDiv = document.getElementById('savingsList');
         const savingsSubmitBtn = document.getElementById('savingsSubmitBtn');
@@ -1349,6 +1361,10 @@
                 document.getElementById('detailGoalDate').textContent = formatDate(item.targetDate);
                 document.getElementById('detailCurrentSaved').textContent = '₱' + formatCurrency(item.savedAmount || 0);
 
+                const descTextarea = document.getElementById('detailDescription');
+                descTextarea.value = item.description || '';
+                descTextarea.onblur = () => updateSavingsDescription(id, descTextarea.value);
+
                 const savedInput = document.getElementById('detailSavedInput');
                 savedInput.value = ''; // Always clear for adding
 
@@ -1415,6 +1431,14 @@
             }
         };
 
+        window.updateSavingsDescription = function (id, text) {
+            const item = trackerData.savings.find(x => x.id === id);
+            if (item) {
+                item.description = text;
+                saveData();
+            }
+        };
+
         window.toggleSavingsSettings = function () {
             const menu = document.getElementById('detailSettingsMenu');
             menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
@@ -1430,6 +1454,7 @@
             const id = savingsEditIdInput.value;
             const name = savingsNameInput.value;
             const targetAmount = parseFloat(savingsTargetInput.value);
+            const description = savingsDescriptionInput.value;
             const targetDate = savingsDateInput.value;
 
             if (name && targetAmount > 0 && targetDate) {
@@ -1438,6 +1463,7 @@
                     if (item) {
                         item.name = name;
                         item.targetAmount = targetAmount;
+                        item.description = description;
                         item.targetDate = targetDate;
                     }
                 } else {
@@ -1446,6 +1472,7 @@
                         id: Date.now().toString(36) + Math.random().toString(36).substr(2),
                         name: name,
                         targetAmount: targetAmount,
+                        description: description,
                         targetDate: targetDate
                     });
                 }
@@ -1469,6 +1496,7 @@
                 savingsEditIdInput.value = item.id;
                 savingsNameInput.value = item.name;
                 savingsTargetInput.value = item.targetAmount;
+                savingsDescriptionInput.value = item.description || '';
                 savingsDateInput.value = item.targetDate;
 
                 document.getElementById('savingsModalTitle').textContent = 'Edit Savings Goal';

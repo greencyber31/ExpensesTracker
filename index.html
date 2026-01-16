@@ -743,8 +743,8 @@
         // --- State ---
         // Data Structure: { food: [], nonFood: [], savings: [] }
         let trackerData = { food: [], nonFood: [], savings: [] };
-        let activeTab = 'food'; // 'food' or 'nonFood'
-        let activeView = 'expenses'; // 'expenses' or 'savings'
+        let activeTab = localStorage.getItem('activeTab') || 'food'; // 'food' or 'nonFood'
+        let activeView = localStorage.getItem('activeView') || 'expenses'; // 'expenses' or 'savings'
 
         // Persistent Collapsed State
         let collapsedDays = new Set();
@@ -822,6 +822,7 @@
 
         window.showView = function (view) {
             activeView = view;
+            localStorage.setItem('activeView', view);
             closeNav();
 
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
@@ -889,6 +890,7 @@
         // --- UI Logic ---
         function switchTab(tab) {
             activeTab = tab;
+            localStorage.setItem('activeTab', tab);
 
             // Update Tab UI
             tabBtns.forEach(btn => {
@@ -1531,8 +1533,9 @@
         };
 
         // Init
-        // Initialize UI with default tab
-        switchTab('food');
+        // Initialize UI with saved view and tab
+        showView(activeView);
+        switchTab(activeTab);
 
         // --- Service Worker Registration ---
         if ('serviceWorker' in navigator) {

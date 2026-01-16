@@ -367,309 +367,506 @@
                 gap: 2px;
             }
         }
+
+        /* Hamburger Menu Icon */
+        .menu-bar {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 4px 0;
+            transition: 0.4s;
+        }
+
+        .header-bar {
+            display: flex;
+            align-items: center;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .hamburger-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 1001;
+            margin-right: 10px;
+        }
+
+        .header-title {
+            flex-grow: 1;
+            text-align: center;
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 35px;
+            /* Offset for hamburger button to keep center */
+        }
+
+        /* Side Navigation */
+        .sidenav {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            left: 0;
+            background-color: #fff;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 60px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidenav a {
+            padding: 15px 32px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            color: #333;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidenav a:hover {
+            background-color: #f1f1f1;
+            color: #28a745;
+        }
+
+        .sidenav .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            font-size: 30px;
+            margin-left: 50px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* Savings Specific Styling */
+        .savings-progress {
+            margin-top: 10px;
+            background: #eee;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .savings-bar {
+            background: #28a745;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="card">
-            <h1
-                style="text-align: center; background-color: #28a745; color: white; padding: 15px; border-radius: 8px; margin-top: 0; margin-bottom: 20px; font-size: 1.8rem;">
-                Expenses Tracker</h1>
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="food">Food</button>
-                <button class="tab-btn" data-tab="nonFood">General</button>
-            </div>
+    <div id="navOverlay" class="nav-overlay" onclick="closeNav()"></div>
 
-            <h2 id="pageTitle">Daily Food Expenses</h2>
-
-            <form id="expenseForm">
-                <input type="hidden" id="editId">
-                <input type="hidden" id="category" value="">
-
-                <div id="categoryContainer" class="category-container">
-                    <!-- Buttons injected by JS -->
-                </div>
-
-                <div class="input-row">
-                    <input type="text" id="itemName" placeholder="Item Name" maxlength="50" required>
-                    <input type="number" id="amount" step="0.01" max="99999" placeholder="Cost (₱)" required>
-                    <input type="datetime-local" id="dateInput" style="color: #666;">
-                </div>
-                <small style="color: #888; font-size: 0.8rem; margin-top: -10px; margin-bottom: 5px;">Leave date blank
-                    to
-                    use current time</small>
-
-                <button type="submit" id="submitBtn">Add Expense</button>
-                <button type="button" id="cancelEditBtn" class="cancel-btn">Cancel Edit</button>
-            </form>
-
-            <div id="list"></div>
-
-            <div id="listControls"
-                style="display: flex; align-items: center; gap: 10px; margin-top: 15px; margin-bottom: 10px; padding: 8px 10px; background: #e9ecef; border-radius: 4px; display: none;">
-                <input type="checkbox" id="selectAllCheckbox" onchange="toggleAllEntries(this.checked)"
-                    style="width: 17px; height: 17px; cursor: pointer;">
-                <label for="selectAllCheckbox"
-                    style="font-weight: bold; color: #495057; cursor: pointer; font-size: 0.8rem;">Select
-                    All</label>
-            </div>
-
-            <div class="total-section" style="margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px;">
-                <div id="totalDisplay" style="font-size: 1.5rem; color: #666;">Subtotal: ₱0.00</div>
-                <div style="border-top: 1px dashed #ddd; margin: 10px 0;"></div>
-                <div id="grandTotalDisplay" style="font-size: 1.6rem; font-weight: bold; color: #333; margin-top: 5px;">
-                    Grand Total: ₱0.00</div>
-            </div>
-
-            <div class="actions">
-                <div class="btn-bar">
-                    <a id="saveBtn" class="bar-btn btn-save">💾 Save</a>
-                    <label for="fileInput" class="bar-btn btn-load">📂 Load</label>
-                    <a id="moreOptionsBtn" onclick="toggleMoreOptions()" class="bar-btn btn-more">⚙️ More</a>
-                </div>
-                <!-- Hidden inputs -->
-                <a id="downloadBtn" style="display:none;">Download CSV</a>
-                <input type="file" id="fileInput" accept=".csv" style="display: none;">
-
-                <div id="moreOptionsGroup" class="action-group"
-                    style="display: none; border-top: 1px dashed #eee; padding-top: 15px; margin-top: 15px;">
-                    <a onclick="showInstallInfo()"
-                        style="color: #28a745; cursor: pointer; font-weight: bold; display: block; margin-bottom: 10px;">⚡
-                        Install as Mobile App</a>
-                    <a id="clearBtn" style="color: #dc3545; cursor: pointer; display: block;">🗑️ Clear Current List</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Install Modal -->
-        <div id="installModal"
-            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
-            <div class="card" style="max-width:400px; width:100%; position:relative;">
-                <h2 style="color:#28a745;">Install App</h2>
-                <p>To use this as a standalone app (no browser bar):</p>
-                <div style="text-align:left; margin-bottom:20px;">
-                    <p><strong>📱 Android (Chrome):</strong><br>1. Tap the 3 dots <strong>(⋮)</strong>.<br>2. Select
-                        <strong>'Add to Home Screen'</strong>.
-                    </p>
-                    <p><strong>🍎 iPhone (Safari):</strong><br>1. Tap the Share icon <strong>(↑)</strong>.<br>2. Select
-                        <strong>'Add to Home Screen'</strong>.
-                    </p>
-                </div>
-                <button onclick="hideInstallInfo()"
-                    style="width:100%; background:#6c757d; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; margin-bottom:10px;">Got
-                    it!</button>
-                <button onclick="resetCache()"
-                    style="width:100%; background:none; color:#dc3545; border:1px solid #dc3545; padding:8px; border-radius:6px; cursor:pointer; font-size:0.8rem;">Reset
-                    App Cache (Fix Freezing)</button>
-            </div>
-        </div>
-        <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
-            Created by Carlos Rock Z. Diamante<br>
-            v1.9 (Updated: Jan 15, 11:28 AM)
-        </div>
+    <div id="mySidenav" class="sidenav">
+        <span class="close-btn" onclick="closeNav()">&times;</span>
+        <a href="javascript:void(0)" onclick="showView('expenses')">Expenses Tracker</a>
+        <a href="javascript:void(0)" onclick="showView('savings')">Savings Tracker</a>
     </div>
 
-    <script>
-        // --- Error Steering ---
-        window.onerror = function (msg, url, lineNo, columnNo, error) {
-            alert('Error: ' + msg + '\nLine: ' + lineNo + '\nFile: ' + url);
-            return false;
-        };
+    <div class="container">
+        <div class="card">
+            <div class="header-bar">
+                <button class="hamburger-btn" onclick="openNav()" aria-label="Menu">
+                    <div class="menu-bar"></div>
+                    <div class="menu-bar"></div>
+                    <div class="menu-bar"></div>
+                </button>
+                <h1 class="header-title" id="mainTitle">Expenses Tracker</h1>
+            </div>
 
-        // --- State ---
-        // Data Structure: { food: [], nonFood: [] }
-        let trackerData = { food: [], nonFood: [] };
-        let activeTab = 'food'; // 'food' or 'nonFood'
+            <!-- Expenses View -->
+            <div id="expensesView" class="view-section active">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="food">Food</button>
+                    <button class="tab-btn" data-tab="nonFood">General</button>
+                </div>
 
-        // Persistent Collapsed State
-        let collapsedDays = new Set();
-        try {
-            const savedCollapsed = localStorage.getItem('collapsedDays');
-            if (savedCollapsed) {
-                collapsedDays = new Set(JSON.parse(savedCollapsed));
-            }
-        } catch (e) { console.error("Collapsed State Parse Error", e); }
+                <h2 id="pageTitle">Daily Food Expenses</h2>
 
-        // --- Migration: Check for legacy data ---
-        const legacyData = localStorage.getItem('expenses');
-        const newData = localStorage.getItem('trackerData');
+                <form id="expenseForm">
+                    <input type="hidden" id="editId">
+                    <input type="hidden" id="category" value="">
 
-        if (newData) {
+                    <div id="categoryContainer" class="category-container">
+                        <!-- Buttons injected by JS -->
+                    </div>
+
+                    <div class="input-row">
+                        <input type="text" id="itemName" placeholder="Item Name" maxlength="50" required>
+                        <input type="number" id="amount" step="0.01" max="99999" placeholder="Cost (₱)" required>
+                        <input type="datetime-local" id="dateInput" style="color: #666;">
+                    </div>
+                    <small style="color: #888; font-size: 0.8rem; margin-top: -10px; margin-bottom: 5px;">Leave date
+                        blank
+                        to
+                        use current time</small>
+
+                    <button type="submit" id="submitBtn">Add Expense</button>
+                    <button type="button" id="cancelEditBtn" class="cancel-btn">Cancel Edit</button>
+                </form>
+
+                <div id="list"></div>
+
+                <div id="listControls"
+                    style="display: flex; align-items: center; gap: 10px; margin-top: 15px; margin-bottom: 10px; padding: 8px 10px; background: #e9ecef; border-radius: 4px; display: none;">
+                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleAllEntries(this.checked)"
+                        style="width: 17px; height: 17px; cursor: pointer;">
+                    <label for="selectAllCheckbox"
+                        style="font-weight: bold; color: #495057; cursor: pointer; font-size: 0.8rem;">Select
+                        All</label>
+                </div>
+
+                <div class="total-section" style="margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px;">
+                    <div id="totalDisplay" style="font-size: 1.5rem; color: #666;">Subtotal: ₱0.00</div>
+                    <div style="border-top: 1px dashed #ddd; margin: 10px 0;"></div>
+                    <div id="grandTotalDisplay"
+                        style="font-size: 1.6rem; font-weight: bold; color: #333; margin-top: 5px;">
+                        Grand Total: ₱0.00</div>
+                </div>
+
+                <div class="actions">
+                    <div class="btn-bar">
+                        <a id="saveBtn" class="bar-btn btn-save">💾 Save</a>
+                        <label for="fileInput" class="bar-btn btn-load">📂 Load</label>
+                        <a id="moreOptionsBtn" onclick="toggleMoreOptions()" class="bar-btn btn-more">⚙️ More</a>
+                    </div>
+                    <!-- Hidden inputs -->
+                    <a id="downloadBtn" style="display:none;">Download CSV</a>
+                    <input type="file" id="fileInput" accept=".csv" style="display: none;">
+
+                    <div id="moreOptionsGroup" class="action-group"
+                        style="display: none; border-top: 1px dashed #eee; padding-top: 15px; margin-top: 15px;">
+                        <a onclick="showInstallInfo()"
+                            style="color: #28a745; cursor: pointer; font-weight: bold; display: block; margin-bottom: 10px;">⚡
+                            Install as Mobile App</a>
+                        <a id="clearBtn" style="color: #dc3545; cursor: pointer; display: block;">🗑️ Clear Current
+                            List</a>
+                    </div>
+                </div>
+
+                <!-- Savings View -->
+                <div id="savingsView" class="view-section">
+                    <h2>Savings Tracker</h2>
+                    <form id="savingsForm">
+                        <input type="hidden" id="savingsEditId">
+                        <div class="input-row">
+                            <input type="text" id="savingsName" placeholder="Savings Name (e.g., New Phone)" required>
+                            <input type="number" id="savingsTarget" step="0.01" placeholder="Amount Target (₱)"
+                                required>
+                            <input type="date" id="savingsDate" required title="Target Date">
+                        </div>
+                        <button type="submit" id="savingsSubmitBtn">Add Savings Goal</button>
+                        <button type="button" id="cancelSavingsEditBtn" class="cancel-btn">Cancel Edit</button>
+                    </form>
+
+                    <div id="savingsList"></div>
+                </div>
+            </div>
+
+            <!-- Install Modal -->
+            <div id="installModal"
+                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+                <div class="card" style="max-width:400px; width:100%; position:relative;">
+                    <h2 style="color:#28a745;">Install App</h2>
+                    <p>To use this as a standalone app (no browser bar):</p>
+                    <div style="text-align:left; margin-bottom:20px;">
+                        <p><strong>📱 Android (Chrome):</strong><br>1. Tap the 3 dots <strong>(⋮)</strong>.<br>2. Select
+                            <strong>'Add to Home Screen'</strong>.
+                        </p>
+                        <p><strong>🍎 iPhone (Safari):</strong><br>1. Tap the Share icon <strong>(↑)</strong>.<br>2.
+                            Select
+                            <strong>'Add to Home Screen'</strong>.
+                        </p>
+                    </div>
+                    <button onclick="hideInstallInfo()"
+                        style="width:100%; background:#6c757d; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; margin-bottom:10px;">Got
+                        it!</button>
+                    <button onclick="resetCache()"
+                        style="width:100%; background:none; color:#dc3545; border:1px solid #dc3545; padding:8px; border-radius:6px; cursor:pointer; font-size:0.8rem;">Reset
+                        App Cache (Fix Freezing)</button>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
+                Created by Carlos Rock Z. Diamante<br>
+                v1.9 (Updated: Jan 15, 11:28 AM)
+            </div>
+        </div>
+
+        <script>
+            // --- Error Steering ---
+            window.onerror = function (msg, url, lineNo, columnNo, error) {
+                alert('Error: ' + msg + '\nLine: ' + lineNo + '\nFile: ' + url);
+                return false;
+            };
+
+            // --- State ---
+            // Data Structure: { food: [], nonFood: [], savings: [] }
+            let trackerData = { food: [], nonFood: [], savings: [] };
+            let activeTab = 'food'; // 'food' or 'nonFood'
+            let activeView = 'expenses'; // 'expenses' or 'savings'
+
+            // Persistent Collapsed State
+            let collapsedDays = new Set();
             try {
-                trackerData = JSON.parse(newData);
-            } catch (e) {
-                console.error("Data Parse Error", e);
-                alert("Warning: Saved data was corrupted and could not be loaded.");
+                const savedCollapsed = localStorage.getItem('collapsedDays');
+                if (savedCollapsed) {
+                    collapsedDays = new Set(JSON.parse(savedCollapsed));
+                }
+            } catch (e) { console.error("Collapsed State Parse Error", e); }
+
+            // --- Migration: Check for legacy data ---
+            const legacyData = localStorage.getItem('expenses');
+            const newData = localStorage.getItem('trackerData');
+
+            if (newData) {
+                try {
+                    trackerData = JSON.parse(newData);
+                } catch (e) {
+                    console.error("Data Parse Error", e);
+                    alert("Warning: Saved data was corrupted and could not be loaded.");
+                }
+            } else if (legacyData) {
+                try {
+                    // Migrate legacy array to food array
+                    trackerData.food = JSON.parse(legacyData);
+                    // Ensure IDs
+                    trackerData.food = trackerData.food.map(ensureId);
+                    localStorage.setItem('trackerData', JSON.stringify(trackerData));
+                    localStorage.removeItem('expenses'); // Cleanup
+                } catch (e) { console.error("Legacy Parse Error", e); }
             }
-        } else if (legacyData) {
-            try {
-                // Migrate legacy array to food array
-                trackerData.food = JSON.parse(legacyData);
-                // Ensure IDs
-                trackerData.food = trackerData.food.map(ensureId);
+
+            // --- Categories Config ---
+            const categories = {
+                food: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
+                nonFood: ['Transport', 'Shopping', 'Utilities', 'Other']
+            };
+
+            // --- DOM Elements ---
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const pageTitle = document.getElementById('pageTitle');
+            const catContainer = document.getElementById('categoryContainer');
+            const catInput = document.getElementById('category');
+            const listDiv = document.getElementById('list');
+            const listControls = document.getElementById('listControls');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const totalDisplay = document.getElementById('totalDisplay');
+            const form = document.getElementById('expenseForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const editIdInput = document.getElementById('editId');
+            const itemNameInput = document.getElementById('itemName');
+            const amountInput = document.getElementById('amount');
+            const dateInput = document.getElementById('dateInput');
+
+            // --- Savings DOM ---
+            const savingsForm = document.getElementById('savingsForm');
+            const savingsNameInput = document.getElementById('savingsName');
+            const savingsTargetInput = document.getElementById('savingsTarget');
+            const savingsDateInput = document.getElementById('savingsDate');
+            const savingsListDiv = document.getElementById('savingsList');
+            const savingsSubmitBtn = document.getElementById('savingsSubmitBtn');
+            const cancelSavingsEditBtn = document.getElementById('cancelSavingsEditBtn');
+            const savingsEditIdInput = document.getElementById('savingsEditId');
+
+            // --- Navigation Logic ---
+            window.openNav = function () {
+                document.getElementById("mySidenav").style.width = "250px";
+                document.getElementById("navOverlay").style.display = "block";
+            }
+
+            window.closeNav = function () {
+                document.getElementById("mySidenav").style.width = "0";
+                document.getElementById("navOverlay").style.display = "none";
+            }
+
+            window.showView = function (view) {
+                activeView = view;
+                closeNav();
+
+                document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+                document.getElementById(view + 'View').classList.add('active');
+
+                const mainTitle = document.getElementById('mainTitle');
+                if (view === 'expenses') {
+                    mainTitle.textContent = 'Expenses Tracker';
+                    renderList();
+                } else {
+                    mainTitle.textContent = 'Savings Tracker';
+                    renderSavingsList();
+                }
+            }
+
+            // --- Helpers ---
+            function ensureId(item) {
+                if (!item.id) item.id = Date.now() + Math.random().toString(16).slice(2);
+                return item;
+            }
+
+            function saveData() {
                 localStorage.setItem('trackerData', JSON.stringify(trackerData));
-                localStorage.removeItem('expenses'); // Cleanup
-            } catch (e) { console.error("Legacy Parse Error", e); }
-        }
-
-        // --- Categories Config ---
-        const categories = {
-            food: ['Breakfast', 'Lunch', 'Dinner', 'Snack'],
-            nonFood: ['Transport', 'Shopping', 'Utilities', 'Other']
-        };
-
-        // --- DOM Elements ---
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const pageTitle = document.getElementById('pageTitle');
-        const catContainer = document.getElementById('categoryContainer');
-        const catInput = document.getElementById('category');
-        const listDiv = document.getElementById('list');
-        const listControls = document.getElementById('listControls');
-        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-        const totalDisplay = document.getElementById('totalDisplay');
-        const form = document.getElementById('expenseForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const editIdInput = document.getElementById('editId');
-        const itemNameInput = document.getElementById('itemName');
-        const amountInput = document.getElementById('amount');
-        const dateInput = document.getElementById('dateInput');
-
-        // --- Helpers ---
-        function ensureId(item) {
-            if (!item.id) item.id = Date.now() + Math.random().toString(16).slice(2);
-            return item;
-        }
-
-        function saveData() {
-            localStorage.setItem('trackerData', JSON.stringify(trackerData));
-        }
-
-        function getActiveList() {
-            return trackerData[activeTab];
-        }
-
-        function formatDate(isoString) {
-            const date = new Date(isoString);
-            return date.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        }
-
-        function formatTime(isoString) {
-            return new Date(isoString).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-        }
-
-        function getDateKey(isoString) {
-            if (!isoString) return 'Unknown Date';
-            return new Date(isoString).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-        }
-
-        // --- UI Logic ---
-        function switchTab(tab) {
-            activeTab = tab;
-
-            // Update Tab UI
-            tabBtns.forEach(btn => {
-                if (btn.dataset.tab === tab) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-
-            // Update Title
-            pageTitle.textContent = tab === 'food' ? "Daily Food Expenses" : "General Expenses";
-
-            // Render Category Buttons
-            renderCategoryButtons();
-
-            // Render List
-            renderList();
-
-            resetForm();
-        }
-
-        function renderCategoryButtons() {
-            catContainer.innerHTML = '';
-            const cats = categories[activeTab];
-
-            // Only override if current value is not valid for this tab
-            if (!cats.includes(catInput.value)) {
-                catInput.value = cats[0];
             }
 
-            cats.forEach((cat, index) => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                // Active if matches current value
-                btn.className = cat === catInput.value ? 'cat-btn active' : 'cat-btn';
-                btn.textContent = cat;
-                btn.onclick = () => selectCategory(cat, btn);
-                catContainer.appendChild(btn);
-            });
-        }
+            function getActiveList() {
+                return trackerData[activeTab];
+            }
 
-        function selectCategory(cat, btnElement) {
-            catInput.value = cat;
-            Array.from(catContainer.children).forEach(b => b.classList.remove('active'));
-            if (btnElement) btnElement.classList.add('active');
-            else {
-                // Find button by text if not passed directly
-                Array.from(catContainer.children).forEach(b => {
-                    if (b.textContent === cat) b.classList.add('active');
+            function formatDate(isoString) {
+                const date = new Date(isoString);
+                return date.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+
+            function formatTime(isoString) {
+                return new Date(isoString).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            }
+
+            function getDateKey(isoString) {
+                if (!isoString) return 'Unknown Date';
+                return new Date(isoString).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+            }
+
+            // --- UI Logic ---
+            function switchTab(tab) {
+                activeTab = tab;
+
+                // Update Tab UI
+                tabBtns.forEach(btn => {
+                    if (btn.dataset.tab === tab) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                });
+
+                // Update Title
+                pageTitle.textContent = tab === 'food' ? "Daily Food Expenses" : "General Expenses";
+
+                // Render Category Buttons
+                renderCategoryButtons();
+
+                // Render List
+                renderList();
+
+                resetForm();
+            }
+
+            function renderCategoryButtons() {
+                catContainer.innerHTML = '';
+                const cats = categories[activeTab];
+
+                // Only override if current value is not valid for this tab
+                if (!cats.includes(catInput.value)) {
+                    catInput.value = cats[0];
+                }
+
+                cats.forEach((cat, index) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    // Active if matches current value
+                    btn.className = cat === catInput.value ? 'cat-btn active' : 'cat-btn';
+                    btn.textContent = cat;
+                    btn.onclick = () => selectCategory(cat, btn);
+                    catContainer.appendChild(btn);
                 });
             }
-        }
 
-        function formatCurrency(amount) {
-            return parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        function renderList() {
-            const list = getActiveList();
-            listDiv.innerHTML = '';
-            let grandTotal = 0;
-
-            if (list.length === 0) {
-                listControls.style.display = 'none';
-                listDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">No entries yet.</div>';
-                totalDisplay.textContent = `Total: ₱${formatCurrency(0)}`;
-                return;
+            function selectCategory(cat, btnElement) {
+                catInput.value = cat;
+                Array.from(catContainer.children).forEach(b => b.classList.remove('active'));
+                if (btnElement) btnElement.classList.add('active');
+                else {
+                    // Find button by text if not passed directly
+                    Array.from(catContainer.children).forEach(b => {
+                        if (b.textContent === cat) b.classList.add('active');
+                    });
+                }
             }
 
-            listControls.style.display = 'flex';
-            const allChecked = list.every(item => item.checked !== false);
-            selectAllCheckbox.checked = allChecked;
+            function formatCurrency(amount) {
+                return parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
 
-            // Sort by date desc
-            const sorted = [...list].sort((a, b) => new Date(b.date) - new Date(a.date));
+            function renderList() {
+                const list = getActiveList();
+                listDiv.innerHTML = '';
+                let grandTotal = 0;
 
-            // Grouping
-            const grouped = {};
-            const uniqueKeys = [];
-
-            sorted.forEach(item => {
-                const key = getDateKey(item.date);
-                if (!grouped[key]) {
-                    grouped[key] = [];
-                    uniqueKeys.push(key);
+                if (list.length === 0) {
+                    listControls.style.display = 'none';
+                    listDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">No entries yet.</div>';
+                    totalDisplay.textContent = `Total: ₱${formatCurrency(0)}`;
+                    return;
                 }
-                grouped[key].push(item);
-            });
 
-            uniqueKeys.forEach(dateKey => {
-                const items = grouped[dateKey];
-                // Calculate Daily Total (Only Checked Items)
-                const dayTotal = items.reduce((sum, item) => {
-                    const isChecked = item.checked !== false;
-                    return isChecked ? sum + parseFloat(item.amount) : sum;
-                }, 0);
+                listControls.style.display = 'flex';
+                const allChecked = list.every(item => item.checked !== false);
+                selectAllCheckbox.checked = allChecked;
 
-                const header = document.createElement('div');
-                header.className = 'date-header';
-                const isCollapsed = collapsedDays.has(dateKey);
+                // Sort by date desc
+                const sorted = [...list].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                // Check if all items for this day are checked
-                const allChecked = items.every(item => item.checked !== false);
+                // Grouping
+                const grouped = {};
+                const uniqueKeys = [];
 
-                header.innerHTML = `
+                sorted.forEach(item => {
+                    const key = getDateKey(item.date);
+                    if (!grouped[key]) {
+                        grouped[key] = [];
+                        uniqueKeys.push(key);
+                    }
+                    grouped[key].push(item);
+                });
+
+                uniqueKeys.forEach(dateKey => {
+                    const items = grouped[dateKey];
+                    // Calculate Daily Total (Only Checked Items)
+                    const dayTotal = items.reduce((sum, item) => {
+                        const isChecked = item.checked !== false;
+                        return isChecked ? sum + parseFloat(item.amount) : sum;
+                    }, 0);
+
+                    const header = document.createElement('div');
+                    header.className = 'date-header';
+                    const isCollapsed = collapsedDays.has(dateKey);
+
+                    // Check if all items for this day are checked
+                    const allChecked = items.every(item => item.checked !== false);
+
+                    header.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span class="toggle-icon ${isCollapsed ? 'collapsed' : ''}">▾</span>
                         <input type="checkbox" 
@@ -681,16 +878,16 @@
                     </div>
                     <span>₱${formatCurrency(dayTotal)}</span>
                 `;
-                header.onclick = () => toggleDayCollapse(dateKey);
-                listDiv.appendChild(header);
+                    header.onclick = () => toggleDayCollapse(dateKey);
+                    listDiv.appendChild(header);
 
-                if (!isCollapsed) {
-                    items.forEach(item => {
-                        const isChecked = item.checked !== false;
-                        const div = document.createElement('div');
-                        div.className = 'expense-item';
-                        div.style.opacity = isChecked ? '1' : '0.6';
-                        div.innerHTML = `
+                    if (!isCollapsed) {
+                        items.forEach(item => {
+                            const isChecked = item.checked !== false;
+                            const div = document.createElement('div');
+                            div.className = 'expense-item';
+                            div.style.opacity = isChecked ? '1' : '0.6';
+                            div.innerHTML = `
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <input type="checkbox" 
                                     ${isChecked ? 'checked' : ''} 
@@ -709,397 +906,522 @@
                                 </div>
                             </div>
                         `;
-                        listDiv.appendChild(div);
-                    });
-                }
-                grandTotal += dayTotal;
-            });
+                            listDiv.appendChild(div);
+                        });
+                    }
+                    grandTotal += dayTotal;
+                });
 
-            totalDisplay.textContent = `Subtotal: ₱${formatCurrency(grandTotal)}`;
+                totalDisplay.textContent = `Subtotal: ₱${formatCurrency(grandTotal)}`;
 
-            // Calculate Combined Grand Total (Across all tabs)
-            const globalTotal = ['food', 'nonFood'].reduce((total, tab) => {
-                return total + trackerData[tab].reduce((tabSum, item) => {
-                    return (item.checked !== false) ? tabSum + parseFloat(item.amount) : tabSum;
+                // Calculate Combined Grand Total (Across all tabs)
+                const globalTotal = ['food', 'nonFood'].reduce((total, tab) => {
+                    return total + trackerData[tab].reduce((tabSum, item) => {
+                        return (item.checked !== false) ? tabSum + parseFloat(item.amount) : tabSum;
+                    }, 0);
                 }, 0);
-            }, 0);
 
-            document.getElementById('grandTotalDisplay').textContent = `Grand Total: ₱${formatCurrency(globalTotal)}`;
-        }
+                document.getElementById('grandTotalDisplay').textContent = `Grand Total: ₱${formatCurrency(globalTotal)}`;
+            }
 
-        window.toggleCheck = function (id) {
-            const list = getActiveList();
-            const item = list.find(x => x.id === id);
-            if (item) {
-                // Toggle state (default true if undefined)
-                item.checked = !(item.checked !== false);
+            window.toggleCheck = function (id) {
+                const list = getActiveList();
+                const item = list.find(x => x.id === id);
+                if (item) {
+                    // Toggle state (default true if undefined)
+                    item.checked = !(item.checked !== false);
+                    saveData();
+                    renderList();
+                }
+            };
+
+            window.toggleDayCollapse = function (dateKey) {
+                if (collapsedDays.has(dateKey)) {
+                    collapsedDays.delete(dateKey);
+                } else {
+                    collapsedDays.add(dateKey);
+                }
+                // Save state
+                localStorage.setItem('collapsedDays', JSON.stringify([...collapsedDays]));
+                renderList();
+            };
+
+            window.toggleDayCheck = function (dateKey, isChecked) {
+                const list = getActiveList();
+                list.forEach(item => {
+                    if (getDateKey(item.date) === dateKey) {
+                        item.checked = isChecked;
+                    }
+                });
                 saveData();
                 renderList();
-            }
-        };
+            };
 
-        window.toggleDayCollapse = function (dateKey) {
-            if (collapsedDays.has(dateKey)) {
-                collapsedDays.delete(dateKey);
-            } else {
-                collapsedDays.add(dateKey);
-            }
-            // Save state
-            localStorage.setItem('collapsedDays', JSON.stringify([...collapsedDays]));
-            renderList();
-        };
-
-        window.toggleDayCheck = function (dateKey, isChecked) {
-            const list = getActiveList();
-            list.forEach(item => {
-                if (getDateKey(item.date) === dateKey) {
+            window.toggleAllEntries = function (isChecked) {
+                const list = getActiveList();
+                list.forEach(item => {
                     item.checked = isChecked;
-                }
-            });
-            saveData();
-            renderList();
-        };
-
-        window.toggleAllEntries = function (isChecked) {
-            const list = getActiveList();
-            list.forEach(item => {
-                item.checked = isChecked;
-            });
-            saveData();
-            renderList();
-        };
-
-        // --- Actions ---
-        window.startEdit = function (id) {
-            const list = getActiveList();
-            const item = list.find(x => x.id === id);
-            if (item) {
-                editIdInput.value = item.id;
-                itemNameInput.value = item.item_name;
-                amountInput.value = item.amount;
-
-                // Set Date Input for Editing
-                if (item.date) {
-                    const d = new Date(item.date);
-                    // Format to local ISO: YYYY-MM-DDThh:mm
-                    // Simple trick to get local ISO string
-                    const localIso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
-                    dateInput.value = localIso;
-                } else {
-                    dateInput.value = '';
-                }
-
-                // Support legacy 'meal_type' or new 'category'
-                const cat = item.category || item.meal_type;
-                selectCategory(cat);
-
-                submitBtn.textContent = 'Update Expense';
-                submitBtn.style.backgroundColor = '#007bff';
-                cancelEditBtn.style.display = 'block';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        };
-
-        window.deleteItem = function (id) {
-            if (confirm('Delete this item?')) {
-                trackerData[activeTab] = trackerData[activeTab].filter(item => item.id !== id);
+                });
                 saveData();
                 renderList();
-                if (editIdInput.value === id) resetForm();
+            };
+
+            // --- Actions ---
+            window.startEdit = function (id) {
+                const list = getActiveList();
+                const item = list.find(x => x.id === id);
+                if (item) {
+                    editIdInput.value = item.id;
+                    itemNameInput.value = item.item_name;
+                    amountInput.value = item.amount;
+
+                    // Set Date Input for Editing
+                    if (item.date) {
+                        const d = new Date(item.date);
+                        // Format to local ISO: YYYY-MM-DDThh:mm
+                        // Simple trick to get local ISO string
+                        const localIso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                        dateInput.value = localIso;
+                    } else {
+                        dateInput.value = '';
+                    }
+
+                    // Support legacy 'meal_type' or new 'category'
+                    const cat = item.category || item.meal_type;
+                    selectCategory(cat);
+
+                    submitBtn.textContent = 'Update Expense';
+                    submitBtn.style.backgroundColor = '#007bff';
+                    cancelEditBtn.style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            };
+
+            window.deleteItem = function (id) {
+                if (confirm('Delete this item?')) {
+                    trackerData[activeTab] = trackerData[activeTab].filter(item => item.id !== id);
+                    saveData();
+                    renderList();
+                    if (editIdInput.value === id) resetForm();
+                }
+            };
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = editIdInput.value;
+                const cat = catInput.value;
+                const name = itemNameInput.value;
+                const amt = parseFloat(amountInput.value);
+                const dateVal = dateInput.value;
+
+                if (name && amt > 0) {
+                    // Determine Date: Use input if present, else current time
+                    let finalDate;
+                    if (dateVal) {
+                        finalDate = new Date(dateVal).toISOString();
+                    } else {
+                        finalDate = new Date().toISOString();
+                    }
+
+                    if (id) {
+                        // Update
+                        const list = getActiveList();
+                        const item = list.find(x => x.id === id);
+                        if (item) {
+                            item.category = cat;
+                            if (item.meal_type) delete item.meal_type;
+                            item.item_name = name;
+                            item.amount = amt;
+                            item.date = finalDate; // Update date
+                        }
+                    } else {
+                        // Create
+                        trackerData[activeTab].unshift({
+                            id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                            category: cat,
+                            item_name: name,
+                            amount: amt,
+                            date: finalDate,
+                            checked: true
+                        });
+                    }
+                    saveData();
+                    renderList();
+                    resetForm();
+                }
+            });
+
+            function resetForm() {
+                const preservedCat = catInput.value;
+                form.reset();
+                editIdInput.value = '';
+                dateInput.value = ''; // Clear date input
+                // Restore category or select first if empty
+                selectCategory(preservedCat || categories[activeTab][0]);
+
+                submitBtn.textContent = 'Add Expense';
+                submitBtn.style.backgroundColor = '#28a745';
+                cancelEditBtn.style.display = 'none';
             }
-        };
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = editIdInput.value;
-            const cat = catInput.value;
-            const name = itemNameInput.value;
-            const amt = parseFloat(amountInput.value);
-            const dateVal = dateInput.value;
+            cancelEditBtn.addEventListener('click', resetForm);
 
-            if (name && amt > 0) {
-                // Determine Date: Use input if present, else current time
-                let finalDate;
-                if (dateVal) {
-                    finalDate = new Date(dateVal).toISOString();
-                } else {
-                    finalDate = new Date().toISOString();
+            // --- Savings Tracker Logic ---
+            function renderSavingsList() {
+                savingsListDiv.innerHTML = '';
+                const savings = trackerData.savings || [];
+
+                if (savings.length === 0) {
+                    savingsListDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">No savings goals yet.</div>';
+                    return;
                 }
 
-                if (id) {
-                    // Update
-                    const list = getActiveList();
-                    const item = list.find(x => x.id === id);
-                    if (item) {
-                        item.category = cat;
-                        if (item.meal_type) delete item.meal_type;
-                        item.item_name = name;
-                        item.amount = amt;
-                        item.date = finalDate; // Update date
+                // Sort by date desc
+                const sorted = [...savings].sort((a, b) => new Date(b.targetDate) - new Date(a.targetDate));
+
+                sorted.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'expense-item';
+                    div.innerHTML = `
+                        <div class="item-info">
+                            <strong style="font-size: 1.1rem;">${item.name}</strong>
+                            <span class="meta-info">Target Date: ${formatDate(item.targetDate)}</span>
+                        </div>
+                        <div class="item-left">
+                            <strong>₱${formatCurrency(item.targetAmount)}</strong>
+                            <div class="item-actions">
+                                <button class="action-btn" onclick="startSavingsEdit('${item.id}')">✎</button>
+                                <button class="action-btn delete-btn" onclick="deleteSavingsItem('${item.id}')">×</button>
+                            </div>
+                        </div>
+                    `;
+                    savingsListDiv.appendChild(div);
+                });
+            }
+
+            savingsForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = savingsEditIdInput.value;
+                const name = savingsNameInput.value;
+                const targetAmount = parseFloat(savingsTargetInput.value);
+                const targetDate = savingsDateInput.value;
+
+                if (name && targetAmount > 0 && targetDate) {
+                    if (id) {
+                        const item = trackerData.savings.find(x => x.id === id);
+                        if (item) {
+                            item.name = name;
+                            item.targetAmount = targetAmount;
+                            item.targetDate = targetDate;
+                        }
+                    } else {
+                        if (!trackerData.savings) trackerData.savings = [];
+                        trackerData.savings.unshift({
+                            id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                            name: name,
+                            targetAmount: targetAmount,
+                            targetDate: targetDate
+                        });
                     }
-                } else {
-                    // Create
-                    trackerData[activeTab].unshift({
-                        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-                        category: cat,
-                        item_name: name,
-                        amount: amt,
-                        date: finalDate,
-                        checked: true
+                    saveData();
+                    renderSavingsList();
+                    resetSavingsForm();
+                }
+            });
+
+            function resetSavingsForm() {
+                savingsForm.reset();
+                savingsEditIdInput.value = '';
+                savingsSubmitBtn.textContent = 'Add Savings Goal';
+                savingsSubmitBtn.style.backgroundColor = '#28a745';
+                cancelSavingsEditBtn.style.display = 'none';
+            }
+
+            window.startSavingsEdit = function (id) {
+                const item = trackerData.savings.find(x => x.id === id);
+                if (item) {
+                    savingsEditIdInput.value = item.id;
+                    savingsNameInput.value = item.name;
+                    savingsTargetInput.value = item.targetAmount;
+                    savingsDateInput.value = item.targetDate;
+
+                    savingsSubmitBtn.textContent = 'Update Savings Goal';
+                    savingsSubmitBtn.style.backgroundColor = '#007bff';
+                    cancelSavingsEditBtn.style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            };
+
+            window.deleteSavingsItem = function (id) {
+                if (confirm('Delete this savings goal?')) {
+                    trackerData.savings = trackerData.savings.filter(item => item.id !== id);
+                    saveData();
+                    renderSavingsList();
+                    if (savingsEditIdInput.value === id) resetSavingsForm();
+                }
+            };
+
+            cancelSavingsEditBtn.addEventListener('click', resetSavingsForm);
+
+            // --- Global Features ---
+            // Tab Clicks
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+            });
+
+            // Clear All (Active Tab Only)
+            document.getElementById('clearBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm(`Clear all ${activeTab === 'food' ? 'Food' : 'General'} expenses?`)) {
+                    trackerData[activeTab] = [];
+                    saveData();
+                    renderList();
+                }
+            });
+
+            // Helper to escape CSV fields
+            function escapeCsv(field) {
+                if (field === null || field === undefined) return '';
+                const stringField = String(field);
+                if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
+                    return `"${stringField.replace(/"/g, '""')}"`;
+                }
+                return stringField;
+            }
+
+            // Helper to parse CSV line
+            function parseCsvLine(line) {
+                const result = [];
+                let start = 0;
+                let insideQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    if (line[i] === '"') {
+                        insideQuotes = !insideQuotes;
+                    } else if (line[i] === ',' && !insideQuotes) {
+                        let field = line.substring(start, i);
+                        if (field.startsWith('"') && field.endsWith('"')) {
+                            field = field.substring(1, field.length - 1).replace(/""/g, '"');
+                        }
+                        result.push(field);
+                        start = i + 1;
+                    }
+                }
+                // Push last field
+                let field = line.substring(start);
+                if (field.startsWith('"') && field.endsWith('"')) {
+                    field = field.substring(1, field.length - 1).replace(/""/g, '"');
+                }
+                result.push(field);
+                return result;
+            }
+
+            // Save Function (CSV)
+            document.getElementById('saveBtn').addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                // Added 'Included' column
+                const headers = ['Date', 'Type', 'Category', 'Item Name', 'Amount', 'ID', 'Included'];
+                const rows = [headers.join(',')];
+
+                // Process Food
+                trackerData.food.forEach(item => {
+                    const row = [
+                        escapeCsv(item.date),
+                        'Food',
+                        escapeCsv(item.category || item.meal_type),
+                        escapeCsv(item.item_name),
+                        item.amount,
+                        item.id,
+                        item.checked !== false ? 'true' : 'false'
+                    ];
+                    rows.push(row.join(','));
+                });
+
+                // Process Non-Food
+                trackerData.nonFood.forEach(item => {
+                    const row = [
+                        escapeCsv(item.date),
+                        'General',
+                        escapeCsv(item.category),
+                        escapeCsv(item.item_name),
+                        item.amount,
+                        item.id,
+                        item.checked !== false ? 'true' : 'false'
+                    ];
+                    rows.push(row.join(','));
+                });
+
+                // Process Savings
+                if (trackerData.savings) {
+                    trackerData.savings.forEach(item => {
+                        const row = [
+                            escapeCsv(item.targetDate),
+                            'Savings',
+                            'Goal',
+                            escapeCsv(item.name),
+                            item.targetAmount,
+                            item.id,
+                            'true'
+                        ];
+                        rows.push(row.join(','));
                     });
                 }
-                saveData();
-                renderList();
-                resetForm();
-            }
-        });
 
-        function resetForm() {
-            const preservedCat = catInput.value;
-            form.reset();
-            editIdInput.value = '';
-            dateInput.value = ''; // Clear date input
-            // Restore category or select first if empty
-            selectCategory(preservedCat || categories[activeTab][0]);
+                const csvContent = rows.join('\n');
 
-            submitBtn.textContent = 'Add Expense';
-            submitBtn.style.backgroundColor = '#28a745';
-            cancelEditBtn.style.display = 'none';
-        }
-
-        cancelEditBtn.addEventListener('click', resetForm);
-
-        // --- Global Features ---
-        // Tab Clicks
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-        });
-
-        // Clear All (Active Tab Only)
-        document.getElementById('clearBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            if (confirm(`Clear all ${activeTab === 'food' ? 'Food' : 'General'} expenses?`)) {
-                trackerData[activeTab] = [];
-                saveData();
-                renderList();
-            }
-        });
-
-        // Helper to escape CSV fields
-        function escapeCsv(field) {
-            if (field === null || field === undefined) return '';
-            const stringField = String(field);
-            if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
-                return `"${stringField.replace(/"/g, '""')}"`;
-            }
-            return stringField;
-        }
-
-        // Helper to parse CSV line
-        function parseCsvLine(line) {
-            const result = [];
-            let start = 0;
-            let insideQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                if (line[i] === '"') {
-                    insideQuotes = !insideQuotes;
-                } else if (line[i] === ',' && !insideQuotes) {
-                    let field = line.substring(start, i);
-                    if (field.startsWith('"') && field.endsWith('"')) {
-                        field = field.substring(1, field.length - 1).replace(/""/g, '"');
-                    }
-                    result.push(field);
-                    start = i + 1;
-                }
-            }
-            // Push last field
-            let field = line.substring(start);
-            if (field.startsWith('"') && field.endsWith('"')) {
-                field = field.substring(1, field.length - 1).replace(/""/g, '"');
-            }
-            result.push(field);
-            return result;
-        }
-
-        // Save Function (CSV)
-        document.getElementById('saveBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-
-            // Added 'Included' column
-            const headers = ['Date', 'Type', 'Category', 'Item Name', 'Amount', 'ID', 'Included'];
-            const rows = [headers.join(',')];
-
-            // Process Food
-            trackerData.food.forEach(item => {
-                const row = [
-                    escapeCsv(item.date),
-                    'Food',
-                    escapeCsv(item.category || item.meal_type),
-                    escapeCsv(item.item_name),
-                    item.amount,
-                    item.id,
-                    item.checked !== false ? 'true' : 'false'
-                ];
-                rows.push(row.join(','));
-            });
-
-            // Process Non-Food
-            trackerData.nonFood.forEach(item => {
-                const row = [
-                    escapeCsv(item.date),
-                    'General',
-                    escapeCsv(item.category),
-                    escapeCsv(item.item_name),
-                    item.amount,
-                    item.id,
-                    item.checked !== false ? 'true' : 'false'
-                ];
-                rows.push(row.join(','));
-            });
-
-            const csvContent = rows.join('\n');
-
-            try {
-                if (window.showSaveFilePicker) {
-                    const handle = await window.showSaveFilePicker({
-                        suggestedName: 'tracker_data.csv',
-                        types: [{ description: 'CSV Data', accept: { 'text/csv': ['.csv'] } }],
-                    });
-                    const writable = await handle.createWritable();
-                    await writable.write(csvContent);
-                    await writable.close();
-                    alert('All data saved to CSV!');
-                } else {
-                    downloadFile(csvContent, 'tracker_data.csv', 'text/csv');
-                }
-            } catch (err) {
-                if (err.name !== 'AbortError') downloadFile(csvContent, 'tracker_data.csv', 'text/csv');
-            }
-        });
-
-        function downloadFile(content, fileName, contentType) {
-            const blob = new Blob([content], { type: contentType });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', fileName);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Load Function (CSV)
-        document.getElementById('fileInput').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
                 try {
-                    const text = ev.target.result;
-                    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-
-                    if (lines.length < 2) {
-                        alert('File seems empty or invalid.');
-                        return;
+                    if (window.showSaveFilePicker) {
+                        const handle = await window.showSaveFilePicker({
+                            suggestedName: 'tracker_data.csv',
+                            types: [{ description: 'CSV Data', accept: { 'text/csv': ['.csv'] } }],
+                        });
+                        const writable = await handle.createWritable();
+                        await writable.write(csvContent);
+                        await writable.close();
+                        alert('All data saved to CSV!');
+                    } else {
+                        downloadFile(csvContent, 'tracker_data.csv', 'text/csv');
                     }
+                } catch (err) {
+                    if (err.name !== 'AbortError') downloadFile(csvContent, 'tracker_data.csv', 'text/csv');
+                }
+            });
 
-                    // Check Header
-                    const header = lines[0].split(',');
+            function downloadFile(content, fileName, contentType) {
+                const blob = new Blob([content], { type: contentType });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', fileName);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
 
-                    if (confirm('Replace ALL data with this CSV file?')) {
-                        const newFood = [];
-                        const newNonFood = [];
+            // Load Function (CSV)
+            document.getElementById('fileInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const text = ev.target.result;
+                        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
 
-                        // Start from 1 to skip header
-                        for (let i = 1; i < lines.length; i++) {
-                            const cols = parseCsvLine(lines[i]);
-                            // Expected indices: 0:Date, 1:Type, 2:Cat, 3:Name, 4:Amt, 5:ID, 6:Included
-                            if (cols.length < 5) continue; // Skip malformed
-
-                            const item = {
-                                date: cols[0],
-                                category: cols[2],
-                                item_name: cols[3],
-                                amount: parseFloat(cols[4]),
-                                id: cols[5] || Date.now().toString(36) + Math.random().toString(36).substr(2),
-                                // Default true if col 6 missing (legacy CSV) or 'true'
-                                checked: (cols[6] === 'false') ? false : true
-                            };
-
-                            if (cols[1] === 'Food') {
-                                newFood.push(item);
-                            } else if (cols[1] === 'NonFood' || cols[1] === 'General') {
-                                newNonFood.push(item);
-                            } else {
-                                newFood.push(item);
-                            }
+                        if (lines.length < 2) {
+                            alert('File seems empty or invalid.');
+                            return;
                         }
 
-                        trackerData = { food: newFood, nonFood: newNonFood };
-                        saveData();
-                        renderList();
-                        alert('Data loaded successfully from CSV!');
-                    }
-                } catch (err) { alert('Error: ' + err.message); }
-                e.target.value = '';
-            };
-            reader.readAsText(file);
-        });
+                        // Check Header
+                        const header = lines[0].split(',');
 
-        // Download CSV (Active Tab) - REMOVED since Save is now CSV
-        document.getElementById('downloadBtn').style.display = 'none';
+                        if (confirm('Replace ALL data with this CSV file?')) {
+                            const newFood = [];
+                            const newNonFood = [];
+                            const newSavings = [];
 
-        // --- UI Modal ---
-        window.showInstallInfo = function () {
-            document.getElementById('installModal').style.display = 'flex';
-        };
-        window.hideInstallInfo = function () {
-            document.getElementById('installModal').style.display = 'none';
-        };
+                            // Start from 1 to skip header
+                            for (let i = 1; i < lines.length; i++) {
+                                const cols = parseCsvLine(lines[i]);
+                                // Expected indices: 0:Date, 1:Type, 2:Cat, 3:Name, 4:Amt, 5:ID, 6:Included
+                                if (cols.length < 5) continue; // Skip malformed
 
-        window.resetCache = function () {
-            if (confirm('This will refresh the app and clear any temporary system errors. Continue?')) {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.getRegistrations().then(registrations => {
-                        for (let registration of registrations) { registration.unregister(); }
-                        caches.keys().then(names => {
-                            for (let name of names) { caches.delete(name); }
-                            window.location.reload(true);
-                        });
-                    });
-                } else {
-                    window.location.reload(true);
-                }
-            }
-        };
+                                if (cols[1] === 'Savings') {
+                                    const savingsItem = {
+                                        id: cols[5] || Date.now().toString(36) + Math.random().toString(36).substr(2),
+                                        name: cols[3],
+                                        targetAmount: parseFloat(cols[4]),
+                                        targetDate: cols[0]
+                                    };
+                                    newSavings.push(savingsItem);
+                                } else {
+                                    const item = {
+                                        date: cols[0],
+                                        category: cols[2],
+                                        item_name: cols[3],
+                                        amount: parseFloat(cols[4]),
+                                        id: cols[5] || Date.now().toString(36) + Math.random().toString(36).substr(2),
+                                        // Default true if col 6 missing (legacy CSV) or 'true'
+                                        checked: (cols[6] === 'false') ? false : true
+                                    };
 
-        // --- More Options Toggle ---
-        window.toggleMoreOptions = function () {
-            const group = document.getElementById('moreOptionsGroup');
-            const btn = document.getElementById('moreOptionsBtn');
-            if (group.style.display === 'none') {
-                group.style.display = 'flex';
-                btn.textContent = 'Hide Options';
-            } else {
-                group.style.display = 'none';
-                btn.textContent = 'Show More...';
-            }
-        };
+                                    if (cols[1] === 'Food') {
+                                        newFood.push(item);
+                                    } else if (cols[1] === 'NonFood' || cols[1] === 'General') {
+                                        newNonFood.push(item);
+                                    } else {
+                                        newFood.push(item);
+                                    }
+                                }
+                            }
 
-        // Init
-        // Initialize UI with default tab
-        switchTab('food');
-
-        // --- Service Worker Registration ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registered', reg))
-                    .catch(err => console.log('Service Worker registration failed', err));
+                            trackerData = { food: newFood, nonFood: newNonFood, savings: newSavings };
+                            saveData();
+                            renderList();
+                            renderSavingsList();
+                            alert('Data loaded successfully from CSV!');
+                        }
+                    } catch (err) { alert('Error: ' + err.message); }
+                    e.target.value = '';
+                };
+                reader.readAsText(file);
             });
-        }
 
-    </script>
+            // Download CSV (Active Tab) - REMOVED since Save is now CSV
+            document.getElementById('downloadBtn').style.display = 'none';
+
+            // --- UI Modal ---
+            window.showInstallInfo = function () {
+                document.getElementById('installModal').style.display = 'flex';
+            };
+            window.hideInstallInfo = function () {
+                document.getElementById('installModal').style.display = 'none';
+            };
+
+            window.resetCache = function () {
+                if (confirm('This will refresh the app and clear any temporary system errors. Continue?')) {
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.getRegistrations().then(registrations => {
+                            for (let registration of registrations) { registration.unregister(); }
+                            caches.keys().then(names => {
+                                for (let name of names) { caches.delete(name); }
+                                window.location.reload(true);
+                            });
+                        });
+                    } else {
+                        window.location.reload(true);
+                    }
+                }
+            };
+
+            // --- More Options Toggle ---
+            window.toggleMoreOptions = function () {
+                const group = document.getElementById('moreOptionsGroup');
+                const btn = document.getElementById('moreOptionsBtn');
+                if (group.style.display === 'none') {
+                    group.style.display = 'flex';
+                    btn.textContent = 'Hide Options';
+                } else {
+                    group.style.display = 'none';
+                    btn.textContent = 'Show More...';
+                }
+            };
+
+            // Init
+            // Initialize UI with default tab
+            switchTab('food');
+
+            // --- Service Worker Registration ---
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('sw.js')
+                        .then(reg => console.log('Service Worker registered', reg))
+                        .catch(err => console.log('Service Worker registration failed', err));
+                });
+            }
+
+        </script>
 </body>
 
 </html>

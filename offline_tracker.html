@@ -185,25 +185,6 @@
             color: #495057;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .date-header:hover {
-            background-color: #dfe3e6;
-        }
-
-        .toggle-icon {
-            display: inline-block;
-            transition: transform 0.2s;
-            margin-right: 8px;
-            font-size: 1.2rem;
-            color: #666;
-        }
-
-        .toggle-icon.collapsed {
-            transform: rotate(-90deg);
         }
 
         .expense-item {
@@ -287,50 +268,6 @@
         .actions a:hover,
         .actions label:hover {
             text-decoration: underline;
-        }
-
-        /* Button Bar Styles */
-        .btn-bar {
-            display: flex;
-            gap: 8px;
-            margin-top: 15px;
-        }
-
-        .bar-btn {
-            flex: 1;
-            padding: 12px 5px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 0.9rem;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .btn-save {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-load {
-            background-color: #f8f9fa;
-            color: #495057;
-            border-color: #ddd;
-        }
-
-        .btn-more {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .bar-btn:active {
-            transform: scale(0.98);
-            opacity: 0.9;
         }
 
         #fileInput {
@@ -552,51 +489,39 @@
                         All</label>
                 </div>
 
-                <div class="total-section" style="margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px;">
-                    <div id="totalDisplay" style="font-size: 1.5rem; color: #666;">Subtotal: ₱0.00</div>
-                    <div style="border-top: 1px dashed #ddd; margin: 10px 0;"></div>
-                    <div id="grandTotalDisplay"
-                        style="font-size: 1.6rem; font-weight: bold; color: #333; margin-top: 5px;">
-                        Grand Total: ₱0.00</div>
-                </div>
+                <div class="total" id="totalDisplay">Total: ₱0.00</div>
 
                 <div class="actions">
-                    <div class="btn-bar">
-                        <a id="saveBtn" class="bar-btn btn-save">💾 Save</a>
-                        <label for="fileInput" class="bar-btn btn-load">📂 Load</label>
-                        <a id="moreOptionsBtn" onclick="toggleMoreOptions()" class="bar-btn btn-more">⚙️ More</a>
+                    <div class="action-group">
+                        <a id="downloadBtn" style="display:none;">Download CSV</a>
+                        <a id="saveBtn">Save Data (CSV)</a>
+                        <label for="fileInput">Load Data (CSV)</label>
+                        <input type="file" id="fileInput" accept=".csv">
+                        <a onclick="showInstallInfo()" style="color: #28a745; cursor: pointer; font-weight: bold;">�
+                            Install
+                            as Mobile App</a>
                     </div>
-                    <!-- Hidden inputs -->
-                    <a id="downloadBtn" style="display:none;">Download CSV</a>
-                    <input type="file" id="fileInput" accept=".csv" style="display: none;">
-
-                    <div id="moreOptionsGroup" class="action-group"
-                        style="display: none; border-top: 1px dashed #eee; padding-top: 15px; margin-top: 15px;">
-                        <a onclick="showInstallInfo()"
-                            style="color: #28a745; cursor: pointer; font-weight: bold; display: block; margin-bottom: 10px;">⚡
-                            Install as Mobile App</a>
-                        <a id="clearBtn" style="color: #dc3545; cursor: pointer; display: block;">🗑️ Clear Current
-                            List</a>
+                    <div class="action-group">
+                        <a id="clearBtn" style="color: #dc3545;">Clear Current List</a>
                     </div>
                 </div>
+            </div>
 
-                <!-- Savings View -->
-                <div id="savingsView" class="view-section">
-                    <h2>Savings Tracker</h2>
-                    <form id="savingsForm">
-                        <input type="hidden" id="savingsEditId">
-                        <div class="input-row">
-                            <input type="text" id="savingsName" placeholder="Savings Name (e.g., New Phone)" required>
-                            <input type="number" id="savingsTarget" step="0.01" placeholder="Amount Target (₱)"
-                                required>
-                            <input type="date" id="savingsDate" required title="Target Date">
-                        </div>
-                        <button type="submit" id="savingsSubmitBtn">Add Savings Goal</button>
-                        <button type="button" id="cancelSavingsEditBtn" class="cancel-btn">Cancel Edit</button>
-                    </form>
+            <!-- Savings View -->
+            <div id="savingsView" class="view-section">
+                <h2>Savings Tracker</h2>
+                <form id="savingsForm">
+                    <input type="hidden" id="savingsEditId">
+                    <div class="input-row">
+                        <input type="text" id="savingsName" placeholder="Savings Name (e.g., New Phone)" required>
+                        <input type="number" id="savingsTarget" step="0.01" placeholder="Amount Target (₱)" required>
+                        <input type="date" id="savingsDate" required title="Target Date">
+                    </div>
+                    <button type="submit" id="savingsSubmitBtn">Add Savings Goal</button>
+                    <button type="button" id="cancelSavingsEditBtn" class="cancel-btn">Cancel Edit</button>
+                </form>
 
-                    <div id="savingsList"></div>
-                </div>
+                <div id="savingsList"></div>
             </div>
 
             <!-- Install Modal -->
@@ -623,8 +548,7 @@
                 </div>
             </div>
             <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
-                Created by Carlos Rock Z. Diamante<br>
-                v1.9 (Updated: Jan 15, 11:28 AM)
+                Created by Carlos Rock Z. Diamante
             </div>
         </div>
 
@@ -640,15 +564,6 @@
             let trackerData = { food: [], nonFood: [], savings: [] };
             let activeTab = 'food'; // 'food' or 'nonFood'
             let activeView = 'expenses'; // 'expenses' or 'savings'
-
-            // Persistent Collapsed State
-            let collapsedDays = new Set();
-            try {
-                const savedCollapsed = localStorage.getItem('collapsedDays');
-                if (savedCollapsed) {
-                    collapsedDays = new Set(JSON.parse(savedCollapsed));
-                }
-            } catch (e) { console.error("Collapsed State Parse Error", e); }
 
             // --- Migration: Check for legacy data ---
             const legacyData = localStorage.getItem('expenses');
@@ -721,6 +636,7 @@
                 closeNav();
 
                 document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+                document.getElementById(view + 'View').classList.remove('active'); // Safety
                 document.getElementById(view + 'View').classList.add('active');
 
                 const mainTitle = document.getElementById('mainTitle');
@@ -861,67 +777,52 @@
 
                     const header = document.createElement('div');
                     header.className = 'date-header';
-                    const isCollapsed = collapsedDays.has(dateKey);
 
                     // Check if all items for this day are checked
                     const allChecked = items.every(item => item.checked !== false);
 
                     header.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <span class="toggle-icon ${isCollapsed ? 'collapsed' : ''}">▾</span>
                         <input type="checkbox" 
                             ${allChecked ? 'checked' : ''} 
-                            onchange="event.stopPropagation(); toggleDayCheck('${dateKey}', this.checked)"
-                            onclick="event.stopPropagation()"
-                            style="width: 19px; height: 19px; cursor: pointer;">
+                            onchange="toggleDayCheck('${dateKey}', this.checked)"
+                            style="width: 24px; height: 24px; cursor: pointer;">
                         <span>${dateKey}</span>
                     </div>
                     <span>₱${formatCurrency(dayTotal)}</span>
                 `;
-                    header.onclick = () => toggleDayCollapse(dateKey);
                     listDiv.appendChild(header);
 
-                    if (!isCollapsed) {
-                        items.forEach(item => {
-                            const isChecked = item.checked !== false;
-                            const div = document.createElement('div');
-                            div.className = 'expense-item';
-                            div.style.opacity = isChecked ? '1' : '0.6';
-                            div.innerHTML = `
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <input type="checkbox" 
-                                    ${isChecked ? 'checked' : ''} 
-                                    onchange="toggleCheck('${item.id}')"
-                                    style="width: 19px; height: 19px; cursor: pointer; margin-right: 5px;">
-                                <div class="item-info">
-                                    <span><span class="tag">${item.category || item.meal_type}</span> ${item.item_name}</span>
-                                    <span class="meta-info">${formatTime(item.date)}</span>
-                                </div>
+                    items.forEach(item => {
+                        const isChecked = item.checked !== false;
+                        const div = document.createElement('div');
+                        div.className = 'expense-item';
+                        div.style.opacity = isChecked ? '1' : '0.6';
+                        div.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" 
+                                ${isChecked ? 'checked' : ''} 
+                                onchange="toggleCheck('${item.id}')"
+                                style="width: 24px; height: 24px; cursor: pointer; margin-right: 5px;">
+                            <div class="item-info">
+                                <span><span class="tag">${item.category || item.meal_type}</span> ${item.item_name}</span>
+                                <span class="meta-info">${formatTime(item.date)}</span>
                             </div>
-                            <div class="item-left">
-                                <strong>₱${formatCurrency(item.amount)}</strong>
-                                <div class="item-actions">
-                                    <button class="action-btn" onclick="startEdit('${item.id}')">✎</button>
-                                    <button class="action-btn delete-btn" onclick="deleteItem('${item.id}')">×</button>
-                                </div>
+                        </div>
+                        <div class="item-left">
+                            <strong>₱${formatCurrency(item.amount)}</strong>
+                            <div class="item-actions">
+                                <button class="action-btn" onclick="startEdit('${item.id}')">✎</button>
+                                <button class="action-btn delete-btn" onclick="deleteItem('${item.id}')">×</button>
                             </div>
-                        `;
-                            listDiv.appendChild(div);
-                        });
-                    }
+                        </div>
+                    `;
+                        listDiv.appendChild(div);
+                    });
                     grandTotal += dayTotal;
                 });
 
-                totalDisplay.textContent = `Subtotal: ₱${formatCurrency(grandTotal)}`;
-
-                // Calculate Combined Grand Total (Across all tabs)
-                const globalTotal = ['food', 'nonFood'].reduce((total, tab) => {
-                    return total + trackerData[tab].reduce((tabSum, item) => {
-                        return (item.checked !== false) ? tabSum + parseFloat(item.amount) : tabSum;
-                    }, 0);
-                }, 0);
-
-                document.getElementById('grandTotalDisplay').textContent = `Grand Total: ₱${formatCurrency(globalTotal)}`;
+                totalDisplay.textContent = `Total: ₱${formatCurrency(grandTotal)}`;
             }
 
             window.toggleCheck = function (id) {
@@ -933,17 +834,6 @@
                     saveData();
                     renderList();
                 }
-            };
-
-            window.toggleDayCollapse = function (dateKey) {
-                if (collapsedDays.has(dateKey)) {
-                    collapsedDays.delete(dateKey);
-                } else {
-                    collapsedDays.add(dateKey);
-                }
-                // Save state
-                localStorage.setItem('collapsedDays', JSON.stringify([...collapsedDays]));
-                renderList();
             };
 
             window.toggleDayCheck = function (dateKey, isChecked) {
@@ -1342,12 +1232,12 @@
                                 } else if (cols[1] === 'NonFood' || cols[1] === 'General') {
                                     newNonFood.push(item);
                                 } else if (cols[1] === 'Savings') {
-                                    // For savings, 'date' is targetDate, 'category' is 'Goal', 'item_name' is 'name'
+                                    // Savings items have different properties
                                     newSavings.push({
-                                        id: item.id,
-                                        name: item.item_name,
-                                        targetAmount: item.amount,
-                                        targetDate: item.date
+                                        id: cols[5] || Date.now().toString(36) + Math.random().toString(36).substr(2),
+                                        name: cols[3],
+                                        targetAmount: parseFloat(cols[4]),
+                                        targetDate: cols[0]
                                     });
                                 } else {
                                     newFood.push(item);
@@ -1390,19 +1280,6 @@
                     } else {
                         window.location.reload(true);
                     }
-                }
-            };
-
-            // --- More Options Toggle ---
-            window.toggleMoreOptions = function () {
-                const group = document.getElementById('moreOptionsGroup');
-                const btn = document.getElementById('moreOptionsBtn');
-                if (group.style.display === 'none') {
-                    group.style.display = 'flex';
-                    btn.textContent = 'Hide Options';
-                } else {
-                    group.style.display = 'none';
-                    btn.textContent = 'Show More...';
                 }
             };
 

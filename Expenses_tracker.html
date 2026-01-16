@@ -728,31 +728,46 @@
 
     <!-- Savings Detail Modal -->
     <div id="savingsDetailModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
                 <h2 id="detailGoalName">Goal Details</h2>
                 <span class="close-modal" onclick="closeSavingsDetail()">&times;</span>
             </div>
-            <div id="detailContent" style="margin-bottom: 25px; font-size: 1.1rem; line-height: 1.6; color: #444;">
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                    <span
-                        style="display: block; font-size: 0.9rem; color: #888; font-weight: bold; text-transform: uppercase;">Goal
-                        Amount</span>
-                    <span id="detailGoalAmount" style="font-size: 1.5rem; font-weight: bold; color: #333;"></span>
+            <div id="detailContent" style="margin-bottom: 20px; font-size: 1.1rem; line-height: 1.6; color: #444;">
+                <div
+                    style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span
+                            style="display: block; font-size: 0.8rem; color: #888; font-weight: bold; text-transform: uppercase;">Goal
+                            Amount</span>
+                        <span id="detailGoalAmount" style="font-size: 1.2rem; font-weight: bold; color: #333;"></span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span
+                            style="display: block; font-size: 0.8rem; color: #888; font-weight: bold; text-transform: uppercase;">Target
+                            Date</span>
+                        <span id="detailGoalDate" style="font-size: 1rem; font-weight: bold; color: #333;"></span>
+                    </div>
                 </div>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                    <span
-                        style="display: block; font-size: 0.9rem; color: #888; font-weight: bold; text-transform: uppercase;">Target
-                        Date</span>
-                    <span id="detailGoalDate" style="font-weight: bold; color: #333;"></span>
+
+                <div style="background: #fff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px;">
+                    <label
+                        style="display: block; font-size: 0.85rem; color: #64748b; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">Already
+                        Saved in Real Life:</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="detailSavedInput" step="0.01" placeholder="₱ 0.00"
+                            style="flex: 1; border: 1px solid #cbd5e1; padding: 10px; border-radius: 6px; font-size: 1rem; outline: none;">
+                        <button id="detailSaveProgressBtn"
+                            style="background: #28a745; color: white; border: none; padding: 0 15px; border-radius: 6px; font-weight: bold; cursor: pointer;">Update</button>
+                    </div>
                 </div>
             </div>
             <div class="item-actions"
-                style="justify-content: space-around; border-top: 1px solid #eee; padding-top: 20px;">
+                style="justify-content: flex-end; border-top: 1px solid #eee; padding-top: 15px; gap: 12px;">
                 <button class="action-btn" id="detailEditBtn"
-                    style="font-size: 2.2rem; background: #e7f3ff; color: #007bff; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✎</button>
+                    style="font-size: 0.95rem; background: #f1f5f9; color: #475569; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;">✎</button>
                 <button class="action-btn delete-btn" id="detailDeleteBtn"
-                    style="font-size: 2.2rem; background: #ffebeb; color: #dc3545; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">×</button>
+                    style="font-size: 1.1rem; background: #fff1f2; color: #e11d48; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #fecdd3;">×</button>
             </div>
         </div>
     </div>
@@ -1265,16 +1280,27 @@
             const sorted = [...savings].sort((a, b) => new Date(b.targetDate) - new Date(a.targetDate));
 
             sorted.forEach(item => {
+                const saved = item.savedAmount || 0;
+                const percent = Math.min(100, Math.floor((saved / item.targetAmount) * 100));
+
                 const div = document.createElement('div');
                 div.className = 'expense-item savings-bar-item';
+                div.style.flexDirection = 'column';
+                div.style.alignItems = 'stretch';
                 div.onclick = () => openSavingsDetail(item.id);
                 div.innerHTML = `
-                        <div class="item-info">
-                            <strong style="font-size: 1.1rem; color: #28a745;">${item.name}</strong>
-                            <span class="meta-info">Target Date: ${formatDate(item.targetDate)}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div class="item-info">
+                                <strong style="font-size: 1.1rem; color: #28a745;">${item.name}</strong>
+                                <span class="meta-info">Target Date: ${formatDate(item.targetDate)}</span>
+                            </div>
+                            <div class="item-left" style="text-align: right;">
+                                <strong style="font-size: 1.2rem;">₱${formatCurrency(item.targetAmount)}</strong>
+                                <span style="display: block; font-size: 0.8rem; color: #888;">${percent}% Saved</span>
+                            </div>
                         </div>
-                        <div class="item-left">
-                            <strong style="font-size: 1.2rem;">₱${formatCurrency(item.targetAmount)}</strong>
+                        <div style="background: #eee; height: 6px; border-radius: 3px; overflow: hidden;">
+                            <div style="background: #28a745; width: ${percent}%; height: 100%; transition: width 0.3s;"></div>
                         </div>
                     `;
                 savingsListDiv.appendChild(div);
@@ -1288,6 +1314,13 @@
                 document.getElementById('detailGoalAmount').textContent = '₱' + formatCurrency(item.targetAmount);
                 document.getElementById('detailGoalDate').textContent = formatDate(item.targetDate);
 
+                const savedInput = document.getElementById('detailSavedInput');
+                savedInput.value = item.savedAmount || '';
+
+                document.getElementById('detailSaveProgressBtn').onclick = () => {
+                    updateSavingsProgress(id, savedInput.value);
+                };
+
                 document.getElementById('detailEditBtn').onclick = () => {
                     closeSavingsDetail();
                     startSavingsEdit(id);
@@ -1298,6 +1331,17 @@
                 };
 
                 document.getElementById('savingsDetailModal').style.display = 'flex';
+            }
+        };
+
+        window.updateSavingsProgress = function (id, value) {
+            const amount = parseFloat(value) || 0;
+            const item = trackerData.savings.find(x => x.id === id);
+            if (item) {
+                item.savedAmount = amount;
+                saveData();
+                renderSavingsList();
+                closeSavingsDetail();
             }
         };
 

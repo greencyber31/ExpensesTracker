@@ -665,70 +665,71 @@
                             List</a>
                     </div>
                 </div>
+            </div>
 
-                <!-- Savings View -->
-                <div id="savingsView" class="view-section">
-                    <div class="add-goal-bar" onclick="openSavingsModal()">
-                        <span>➕ Add New Goal</span>
-                    </div>
-                    <div id="savingsList"></div>
+            <!-- Savings View -->
+            <div id="savingsView" class="view-section">
+                <div class="add-goal-bar" onclick="openSavingsModal()">
+                    <span>➕ Add New Goal</span>
                 </div>
+                <div id="savingsList"></div>
             </div>
         </div>
+    </div>
 
-        <!-- Savings Modal -->
-        <div id="savingsModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="savingsModalTitle">New Savings Goal</h2>
-                    <span class="close-modal" onclick="closeSavingsModal()">&times;</span>
-                </div>
-                <form id="savingsForm">
-                    <input type="hidden" id="savingsEditId">
-                    <div class="input-row">
-                        <label style="font-weight: bold; color: #555;">Savings Name</label>
-                        <input type="text" id="savingsName" placeholder="e.g., Brand New Phone" required>
-
-                        <label style="font-weight: bold; color: #555;">Target Amount</label>
-                        <input type="number" id="savingsTarget" step="0.01" placeholder="₱ 0.00" required>
-
-                        <label style="font-weight: bold; color: #555;">Target Date</label>
-                        <input type="date" id="savingsDate" required>
-                    </div>
-                    <button type="submit" id="savingsSubmitBtn" style="margin-top: 10px;">Save Goal</button>
-                    <button type="button" onclick="closeSavingsModal()" class="cancel-btn"
-                        style="display: block; width: 100%; margin-top: 10px; background: #6c757d;">Cancel</button>
-                </form>
+    <!-- Savings Modal -->
+    <div id="savingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="savingsModalTitle">New Savings Goal</h2>
+                <span class="close-modal" onclick="closeSavingsModal()">&times;</span>
             </div>
-        </div>
+            <form id="savingsForm">
+                <input type="hidden" id="savingsEditId">
+                <div class="input-row">
+                    <label style="font-weight: bold; color: #555;">Savings Name</label>
+                    <input type="text" id="savingsName" placeholder="e.g., Brand New Phone" required>
 
-        <!-- Install Modal -->
-        <div id="installModal"
-            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
-            <div class="card" style="max-width:400px; width:100%; position:relative;">
-                <h2 style="color:#28a745;">Install App</h2>
-                <p>To use this as a standalone app (no browser bar):</p>
-                <div style="text-align:left; margin-bottom:20px;">
-                    <p><strong>📱 Android (Chrome):</strong><br>1. Tap the 3 dots <strong>(⋮)</strong>.<br>2. Select
-                        <strong>'Add to Home Screen'</strong>.
-                    </p>
-                    <p><strong>🍎 iPhone (Safari):</strong><br>1. Tap the Share icon <strong>(↑)</strong>.<br>2.
-                        Select
-                        <strong>'Add to Home Screen'</strong>.
-                    </p>
+                    <label style="font-weight: bold; color: #555;">Target Amount</label>
+                    <input type="number" id="savingsTarget" step="0.01" placeholder="₱ 0.00" required>
+
+                    <label style="font-weight: bold; color: #555;">Target Date</label>
+                    <input type="date" id="savingsDate" required>
                 </div>
-                <button onclick="hideInstallInfo()"
-                    style="width:100%; background:#6c757d; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; margin-bottom:10px;">Got
-                    it!</button>
-                <button onclick="resetCache()"
-                    style="width:100%; background:none; color:#dc3545; border:1px solid #dc3545; padding:8px; border-radius:6px; cursor:pointer; font-size:0.8rem;">Reset
-                    App Cache (Fix Freezing)</button>
+                <button type="submit" id="savingsSubmitBtn" style="margin-top: 10px;">Save Goal</button>
+                <button type="button" onclick="closeSavingsModal()" class="cancel-btn"
+                    style="display: block; width: 100%; margin-top: 10px; background: #6c757d;">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Install Modal -->
+    <div id="installModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+        <div class="card" style="max-width:400px; width:100%; position:relative;">
+            <h2 style="color:#28a745;">Install App</h2>
+            <p>To use this as a standalone app (no browser bar):</p>
+            <div style="text-align:left; margin-bottom:20px;">
+                <p><strong>📱 Android (Chrome):</strong><br>1. Tap the 3 dots <strong>(⋮)</strong>.<br>2. Select
+                    <strong>'Add to Home Screen'</strong>.
+                </p>
+                <p><strong>🍎 iPhone (Safari):</strong><br>1. Tap the Share icon <strong>(↑)</strong>.<br>2.
+                    Select
+                    <strong>'Add to Home Screen'</strong>.
+                </p>
             </div>
+            <button onclick="hideInstallInfo()"
+                style="width:100%; background:#6c757d; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; margin-bottom:10px;">Got
+                it!</button>
+            <button onclick="resetCache()"
+                style="width:100%; background:none; color:#dc3545; border:1px solid #dc3545; padding:8px; border-radius:6px; cursor:pointer; font-size:0.8rem;">Reset
+                App Cache (Fix Freezing)</button>
         </div>
-        <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
-            Created by Carlos Rock Z. Diamante<br>
-            v1.9 (Updated: Jan 15, 11:28 AM)
-        </div>
+    </div>
+    <div style="text-align: center; margin-top: 15px; font-size: 0.75rem; color: #999;">
+        Created by Carlos Rock Z. Diamante<br>
+        v1.9 (Updated: Jan 15, 11:28 AM)
+    </div>
     </div>
 
     <script>

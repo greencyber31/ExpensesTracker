@@ -780,6 +780,16 @@
                             style="background: #28a745; color: white; border: none; padding: 0 15px; border-radius: 6px; font-weight: bold; cursor: pointer;">Add</button>
                     </div>
                 </div>
+
+                <div style="margin-top: 15px;">
+                    <span
+                        style="display: block; font-size: 0.8rem; color: #888; font-weight: bold; text-transform: uppercase; margin-bottom: 8px;">Savings
+                        History</span>
+                    <div id="detailHistoryList"
+                        style="max-height: 150px; overflow-y: auto; background: #fbfbfb; border: 1px solid #eee; border-radius: 8px; padding: 5px;">
+                        <!-- History items will appear here -->
+                    </div>
+                </div>
             </div>
             <div class="item-actions"
                 style="justify-content: flex-end; border-top: 1px solid #eee; padding-top: 15px; gap: 12px; align-items: center;">
@@ -1342,6 +1352,29 @@
                 const savedInput = document.getElementById('detailSavedInput');
                 savedInput.value = ''; // Always clear for adding
 
+                // Render History
+                const historyList = document.getElementById('detailHistoryList');
+                historyList.innerHTML = '';
+                if (item.history && item.history.length > 0) {
+                    // Sort history by date descending
+                    const sortedHistory = [...item.history].sort((a, b) => new Date(b.date) - new Date(a.date));
+                    sortedHistory.forEach(entry => {
+                        const div = document.createElement('div');
+                        div.style.display = 'flex';
+                        div.style.justifyContent = 'space-between';
+                        div.style.padding = '8px';
+                        div.style.borderBottom = '1px solid #eee';
+                        div.style.fontSize = '0.9rem';
+                        div.innerHTML = `
+                            <span style="color: #444;">${formatDate(entry.date)} <small style="color: #888;">${formatTime(entry.date)}</small></span>
+                            <strong style="color: #28a745;">+₱${formatCurrency(entry.amount)}</strong>
+                        `;
+                        historyList.appendChild(div);
+                    });
+                } else {
+                    historyList.innerHTML = '<div style="text-align: center; color: #aaa; padding: 20px; font-size: 0.85rem;">No history yet.</div>';
+                }
+
                 document.getElementById('detailSaveProgressBtn').onclick = () => {
                     updateSavingsProgress(id, savedInput.value);
                 };
@@ -1361,14 +1394,27 @@
 
         window.updateSavingsProgress = function (id, value) {
             const amountToAdd = parseFloat(value) || 0;
-            if (amountToAdd === 0) return;
+            if (amountToAdd <= 0) return;
 
             const item = trackerData.savings.find(x => x.id === id);
             if (item) {
+                if (!item.history) item.history = [];
+
+                // Add to history
+                item.history.push({
+                    amount: amountToAdd,
+                    date: new Date().toISOString()
+                });
+
+                // Update total
                 item.savedAmount = (item.savedAmount || 0) + amountToAdd;
+
                 saveData();
                 renderSavingsList();
-                closeSavingsDetail();
+                openSavingsDetail(id); // Refresh the detail view to show new history
+
+                // Optional message
+                // console.log(`Added ₱${amountToAdd} to ${item.name}`);
             }
         };
 

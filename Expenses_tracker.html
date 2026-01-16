@@ -609,10 +609,6 @@
                     <input type="hidden" id="editId">
                     <input type="hidden" id="category" value="">
 
-                    <div id="categoryContainer" class="category-container">
-                        <!-- Buttons injected by JS -->
-                    </div>
-
                     <div class="input-row">
                         <input type="text" id="itemName" placeholder="Item Name" maxlength="50" required>
                         <input type="number" id="amount" step="0.01" max="99999" placeholder="Cost (₱)" required>
@@ -622,6 +618,10 @@
                         blank
                         to
                         use current time</small>
+
+                    <div id="categoryContainer" class="category-container" style="margin-top: 5px;">
+                        <!-- Buttons injected by JS -->
+                    </div>
 
                     <button type="submit" id="submitBtn">Add Expense</button>
                     <button type="button" id="cancelEditBtn" class="cancel-btn">Cancel Edit</button>

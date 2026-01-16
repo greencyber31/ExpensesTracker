@@ -598,6 +598,18 @@
             border-color: #28a745;
             transform: translateX(5px);
         }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 
@@ -763,11 +775,16 @@
                 </div>
             </div>
             <div class="item-actions"
-                style="justify-content: flex-end; border-top: 1px solid #eee; padding-top: 15px; gap: 12px;">
-                <button class="action-btn" id="detailEditBtn"
-                    style="font-size: 0.95rem; background: #f1f5f9; color: #475569; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;">✎</button>
-                <button class="action-btn delete-btn" id="detailDeleteBtn"
-                    style="font-size: 1.1rem; background: #fff1f2; color: #e11d48; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #fecdd3;">×</button>
+                style="justify-content: flex-end; border-top: 1px solid #eee; padding-top: 15px; gap: 12px; align-items: center;">
+                <div id="detailSettingsMenu" style="display: none; gap: 12px; animation: slideInRight 0.2s ease;">
+                    <button class="action-btn" id="detailEditBtn"
+                        style="font-size: 0.95rem; background: #f1f5f9; color: #475569; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;">✎</button>
+                    <button class="action-btn delete-btn" id="detailDeleteBtn"
+                        style="font-size: 1.1rem; background: #fff1f2; color: #e11d48; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #fecdd3;">×</button>
+                </div>
+                <button class="action-btn" onclick="toggleSavingsSettings()"
+                    style="font-size: 1.2rem; background: #f8f9fa; color: #666; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd; transition: all 0.2s;"
+                    aria-label="Settings">⚙</button>
             </div>
         </div>
     </div>
@@ -1345,8 +1362,14 @@
             }
         };
 
+        window.toggleSavingsSettings = function () {
+            const menu = document.getElementById('detailSettingsMenu');
+            menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+        };
+
         window.closeSavingsDetail = function () {
             document.getElementById('savingsDetailModal').style.display = 'none';
+            document.getElementById('detailSettingsMenu').style.display = 'none';
         };
 
         savingsForm.addEventListener('submit', (e) => {

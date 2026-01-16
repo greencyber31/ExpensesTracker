@@ -763,14 +763,21 @@
                 </div>
 
                 <div style="background: #fff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px;">
+                    <div style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed #e2e8f0;">
+                        <span
+                            style="display: block; font-size: 0.8rem; color: #888; font-weight: bold; text-transform: uppercase;">Total
+                            Saved So Far</span>
+                        <span id="detailCurrentSaved"
+                            style="font-size: 1.1rem; font-weight: bold; color: #28a745;">₱0.00</span>
+                    </div>
                     <label
-                        style="display: block; font-size: 0.85rem; color: #64748b; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">Already
-                        Saved in Real Life:</label>
+                        style="display: block; font-size: 0.85rem; color: #475569; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">Add
+                        to Real-Life Savings:</label>
                     <div style="display: flex; gap: 8px;">
-                        <input type="number" id="detailSavedInput" step="0.01" placeholder="₱ 0.00"
+                        <input type="number" id="detailSavedInput" step="0.01" placeholder="₱ 0.00 (Amount to Add)"
                             style="flex: 1; border: 1px solid #cbd5e1; padding: 10px; border-radius: 6px; font-size: 1rem; outline: none;">
                         <button id="detailSaveProgressBtn"
-                            style="background: #28a745; color: white; border: none; padding: 0 15px; border-radius: 6px; font-weight: bold; cursor: pointer;">Update</button>
+                            style="background: #28a745; color: white; border: none; padding: 0 15px; border-radius: 6px; font-weight: bold; cursor: pointer;">Add</button>
                     </div>
                 </div>
             </div>
@@ -1330,9 +1337,10 @@
                 document.getElementById('detailGoalName').textContent = item.name;
                 document.getElementById('detailGoalAmount').textContent = '₱' + formatCurrency(item.targetAmount);
                 document.getElementById('detailGoalDate').textContent = formatDate(item.targetDate);
+                document.getElementById('detailCurrentSaved').textContent = '₱' + formatCurrency(item.savedAmount || 0);
 
                 const savedInput = document.getElementById('detailSavedInput');
-                savedInput.value = item.savedAmount || '';
+                savedInput.value = ''; // Always clear for adding
 
                 document.getElementById('detailSaveProgressBtn').onclick = () => {
                     updateSavingsProgress(id, savedInput.value);
@@ -1352,10 +1360,12 @@
         };
 
         window.updateSavingsProgress = function (id, value) {
-            const amount = parseFloat(value) || 0;
+            const amountToAdd = parseFloat(value) || 0;
+            if (amountToAdd === 0) return;
+
             const item = trackerData.savings.find(x => x.id === id);
             if (item) {
-                item.savedAmount = amount;
+                item.savedAmount = (item.savedAmount || 0) + amountToAdd;
                 saveData();
                 renderSavingsList();
                 closeSavingsDetail();

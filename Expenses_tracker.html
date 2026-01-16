@@ -1571,8 +1571,8 @@
         document.getElementById('saveBtn').addEventListener('click', async (e) => {
             e.preventDefault();
 
-            // Added 'Included' column
-            const headers = ['Date', 'Type', 'Category', 'Item Name', 'Amount', 'ID', 'Included'];
+            // Added 'Included' column and savings-specific columns
+            const headers = ['Date', 'Type', 'Category', 'Item Name', 'Amount', 'ID', 'Included', 'Description', 'SavedAmount', 'History'];
             const rows = [headers.join(',')];
 
             // Process Food
@@ -1584,7 +1584,10 @@
                     escapeCsv(item.item_name),
                     item.amount,
                     item.id,
-                    item.checked !== false ? 'true' : 'false'
+                    item.checked !== false ? 'true' : 'false',
+                    '', // Description (not used for expenses)
+                    '', // SavedAmount (not used for expenses)
+                    ''  // History (not used for expenses)
                 ];
                 rows.push(row.join(','));
             });
@@ -1598,7 +1601,10 @@
                     escapeCsv(item.item_name),
                     item.amount,
                     item.id,
-                    item.checked !== false ? 'true' : 'false'
+                    item.checked !== false ? 'true' : 'false',
+                    '', // Description (not used for expenses)
+                    '', // SavedAmount (not used for expenses)
+                    ''  // History (not used for expenses)
                 ];
                 rows.push(row.join(','));
             });
@@ -1613,7 +1619,10 @@
                         escapeCsv(item.name),
                         item.targetAmount,
                         item.id,
-                        'true'
+                        'true',
+                        escapeCsv(item.description || ''),
+                        item.savedAmount || 0,
+                        escapeCsv(JSON.stringify(item.history || []))
                     ];
                     rows.push(row.join(','));
                 });
@@ -1684,8 +1693,22 @@
                                     id: cols[5] || Date.now().toString(36) + Math.random().toString(36).substr(2),
                                     name: cols[3],
                                     targetAmount: parseFloat(cols[4]),
-                                    targetDate: cols[0]
+                                    targetDate: cols[0],
+                                    description: cols[7] || '', // Column 7: Description
+                                    savedAmount: parseFloat(cols[8]) || 0, // Column 8: SavedAmount
+                                    history: [] // Column 9: History (JSON)
                                 };
+
+                                // Parse history if present
+                                if (cols[9]) {
+                                    try {
+                                        savingsItem.history = JSON.parse(cols[9]);
+                                    } catch (e) {
+                                        console.warn('Failed to parse history for savings item:', e);
+                                        savingsItem.history = [];
+                                    }
+                                }
+
                                 newSavings.push(savingsItem);
                             } else {
                                 const item = {

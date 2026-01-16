@@ -488,27 +488,36 @@
             transition: width 0.3s;
         }
 
-        /* Add Goal Bar */
-        .add-goal-bar {
-            background-color: #f8f9fa;
-            border: 2px dashed #28a745;
-            color: #28a745;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
+        /* Floating Add Goal Button */
+        .add-goal-fab {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            font-size: 32px;
             font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 20px;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: all 0.2s;
+            line-height: 1;
         }
 
-        .add-goal-bar:hover {
-            background-color: #e9f7ef;
-            transform: translateY(-2px);
+        .add-goal-fab:hover {
+            background-color: #218838;
+            transform: scale(1.1);
+        }
+
+        .add-goal-fab:active {
+            transform: scale(0.9);
         }
 
         /* Modal Styles */
@@ -669,10 +678,8 @@
 
             <!-- Savings View -->
             <div id="savingsView" class="view-section">
-                <div class="add-goal-bar" onclick="openSavingsModal()">
-                    <span>➕ Add New Goal</span>
-                </div>
                 <div id="savingsList"></div>
+                <button class="add-goal-fab" onclick="openSavingsModal()" aria-label="Add New Goal">＋</button>
             </div>
         </div>
     </div>

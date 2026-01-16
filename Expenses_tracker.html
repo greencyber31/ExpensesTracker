@@ -582,6 +582,22 @@
         .close-modal:hover {
             color: #333;
         }
+
+        /* Savings Goal Bar Styling */
+        .savings-bar-item {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .savings-bar-item:hover {
+            background-color: #f8f9fa;
+            border-color: #28a745;
+            transform: translateX(5px);
+        }
     </style>
 </head>
 
@@ -707,6 +723,37 @@
                 <button type="button" onclick="closeSavingsModal()" class="cancel-btn"
                     style="display: block; width: 100%; margin-top: 10px; background: #6c757d;">Cancel</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Savings Detail Modal -->
+    <div id="savingsDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detailGoalName">Goal Details</h2>
+                <span class="close-modal" onclick="closeSavingsDetail()">&times;</span>
+            </div>
+            <div id="detailContent" style="margin-bottom: 25px; font-size: 1.1rem; line-height: 1.6; color: #444;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <span
+                        style="display: block; font-size: 0.9rem; color: #888; font-weight: bold; text-transform: uppercase;">Goal
+                        Amount</span>
+                    <span id="detailGoalAmount" style="font-size: 1.5rem; font-weight: bold; color: #333;"></span>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <span
+                        style="display: block; font-size: 0.9rem; color: #888; font-weight: bold; text-transform: uppercase;">Target
+                        Date</span>
+                    <span id="detailGoalDate" style="font-weight: bold; color: #333;"></span>
+                </div>
+            </div>
+            <div class="item-actions"
+                style="justify-content: space-around; border-top: 1px solid #eee; padding-top: 20px;">
+                <button class="action-btn" id="detailEditBtn"
+                    style="font-size: 2.2rem; background: #e7f3ff; color: #007bff; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✎</button>
+                <button class="action-btn delete-btn" id="detailDeleteBtn"
+                    style="font-size: 2.2rem; background: #ffebeb; color: #dc3545; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">×</button>
+            </div>
         </div>
     </div>
 
@@ -857,9 +904,13 @@
         // Close modal when clicking outside
         window.onclick = function (event) {
             const modal = document.getElementById('savingsModal');
+            const detailModal = document.getElementById('savingsDetailModal');
             const navOverlay = document.getElementById('navOverlay');
             if (event.target === modal) {
                 closeSavingsModal();
+            }
+            if (event.target === detailModal) {
+                closeSavingsDetail();
             }
             if (event.target === navOverlay) {
                 closeNav();
@@ -1215,23 +1266,44 @@
 
             sorted.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'expense-item';
+                div.className = 'expense-item savings-bar-item';
+                div.onclick = () => openSavingsDetail(item.id);
                 div.innerHTML = `
                         <div class="item-info">
-                            <strong style="font-size: 1.1rem;">${item.name}</strong>
+                            <strong style="font-size: 1.1rem; color: #28a745;">${item.name}</strong>
                             <span class="meta-info">Target Date: ${formatDate(item.targetDate)}</span>
                         </div>
                         <div class="item-left">
-                            <strong>₱${formatCurrency(item.targetAmount)}</strong>
-                            <div class="item-actions">
-                                <button class="action-btn" onclick="startSavingsEdit('${item.id}')">✎</button>
-                                <button class="action-btn delete-btn" onclick="deleteSavingsItem('${item.id}')">×</button>
-                            </div>
+                            <strong style="font-size: 1.2rem;">₱${formatCurrency(item.targetAmount)}</strong>
                         </div>
                     `;
                 savingsListDiv.appendChild(div);
             });
         }
+
+        window.openSavingsDetail = function (id) {
+            const item = trackerData.savings.find(x => x.id === id);
+            if (item) {
+                document.getElementById('detailGoalName').textContent = item.name;
+                document.getElementById('detailGoalAmount').textContent = '₱' + formatCurrency(item.targetAmount);
+                document.getElementById('detailGoalDate').textContent = formatDate(item.targetDate);
+
+                document.getElementById('detailEditBtn').onclick = () => {
+                    closeSavingsDetail();
+                    startSavingsEdit(id);
+                };
+                document.getElementById('detailDeleteBtn').onclick = () => {
+                    closeSavingsDetail();
+                    deleteSavingsItem(id);
+                };
+
+                document.getElementById('savingsDetailModal').style.display = 'flex';
+            }
+        };
+
+        window.closeSavingsDetail = function () {
+            document.getElementById('savingsDetailModal').style.display = 'none';
+        };
 
         savingsForm.addEventListener('submit', (e) => {
             e.preventDefault();

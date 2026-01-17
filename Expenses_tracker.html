@@ -13,14 +13,12 @@
     <meta name="mobile-web-app-capable" content="yes">
 
     <!-- Icon (Green Box with Peso Sign) -->
-    <link rel="icon" type="image/svg+xml"
-        href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="%2328a745"/><text x="50%" y="55%" dominant-baseline="central" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="300" fill="white">₱</text></svg>'>
-    <link rel="apple-touch-icon"
-        href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="%2328a745"/><text x="50%" y="55%" dominant-baseline="central" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="300" fill="white">₱</text></svg>'>
+    <!-- Icon (Green Box with Peso Sign) -->
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon.svg">
 
-    <!-- Manifest (Data URI for Single File PWA) -->
-    <link rel="manifest"
-        href='data:application/manifest+json,{"name":"Expenses Tracker","short_name":"Expenses","start_url":".","display":"standalone","background_color":"#f4f4f9","theme_color":"#28a745","orientation":"portrait","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Crect width=%22512%22 height=%22512%22 rx=%22100%22 fill=%22%2328a745%22/%3E%3Ctext x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%22300%22 fill=%22white%22%3E₱%3C/text%3E%3C/svg%3E","type":"image/svg+xml","sizes":"512x512"}]}'>
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
     <style>
         body {
             margin: 0;
@@ -1792,8 +1790,33 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registered', reg))
+                    .then(registration => {
+                        console.log('Service Worker registered', registration);
+
+                        // Check for updates periodically
+                        registration.update();
+
+                        // Handle manual updates if needed
+                        registration.onupdatefound = () => {
+                            const installingWorker = registration.installing;
+                            installingWorker.onstatechange = () => {
+                                if (installingWorker.state === 'installed') {
+                                    if (navigator.serviceWorker.controller) {
+                                        console.log('New content is available; please refresh.');
+                                        // Optional: Show a "Update Available" toast here
+                                    } else {
+                                        console.log('Content is cached for offline use.');
+                                    }
+                                }
+                            };
+                        };
+                    })
                     .catch(err => console.log('Service Worker registration failed', err));
+
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    // This fires when the new service worker takes over
+                    window.location.reload();
+                });
             });
         }
 

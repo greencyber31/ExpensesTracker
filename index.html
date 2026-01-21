@@ -1098,11 +1098,14 @@
 
             uniqueKeys.forEach(dateKey => {
                 const items = grouped[dateKey];
-                // Calculate Daily Total (Only Checked Items)
-                const dayTotal = items.reduce((sum, item) => {
+                // Calculate Daily Total (Only Checked Items) for Grand Total
+                const checkedDayTotal = items.reduce((sum, item) => {
                     const isChecked = item.checked !== false;
                     return isChecked ? sum + parseFloat(item.amount) : sum;
                 }, 0);
+
+                // Calculate Absolute Total (For Display)
+                const absoluteDayTotal = items.reduce((sum, item) => sum + parseFloat(item.amount), 0);
 
                 const header = document.createElement('div');
                 header.className = 'date-header';
@@ -1121,7 +1124,7 @@
                             style="width: 19px; height: 19px; cursor: pointer;">
                         <span>${dateKey}</span>
                     </div>
-                    <span>₱${formatCurrency(dayTotal)}</span>
+                    <span>₱${formatCurrency(absoluteDayTotal)}</span>
                 `;
                 header.onclick = () => toggleDayCollapse(dateKey);
                 listDiv.appendChild(header);
@@ -1154,7 +1157,7 @@
                         listDiv.appendChild(div);
                     });
                 }
-                grandTotal += dayTotal;
+                grandTotal += checkedDayTotal;
             });
 
             totalDisplay.textContent = `Subtotal: ₱${formatCurrency(grandTotal)}`;

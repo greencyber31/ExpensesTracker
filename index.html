@@ -19,8 +19,7 @@
         href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="100" fill="%2328a745"/><text x="50%" y="55%" dominant-baseline="central" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="300" fill="white">₱</text></svg>'>
 
     <!-- Manifest (Data URI for Single File PWA) -->
-    <link rel="manifest"
-        href='data:application/manifest+json,{"name":"Expenses Tracker","short_name":"Expenses","start_url":".","display":"standalone","background_color":"#f4f4f9","theme_color":"#28a745","orientation":"portrait","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Crect width=%22512%22 height=%22512%22 rx=%22100%22 fill=%22%2328a745%22/%3E%3Ctext x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%22300%22 fill=%22white%22%3E₱%3C/text%3E%3C/svg%3E","type":"image/svg+xml","sizes":"512x512"}]}'>
+    <link rel="manifest" href="manifest.json">
     <style>
         body {
             margin: 0;
@@ -725,15 +724,15 @@
                     <label style="font-weight: bold; color: #555;">Savings Name</label>
                     <input type="text" id="savingsName" placeholder="e.g., Brand New Phone" required>
 
-                    <label style="font-weight: bold; color: #555;">Target Amount</label>
-                    <input type="number" id="savingsTarget" step="0.01" placeholder="₱ 0.00" required>
+                    <label style="font-weight: bold; color: #555;">Target Amount (Optional)</label>
+                    <input type="number" id="savingsTarget" step="0.01" placeholder="₱ 0.00">
 
                     <label style="font-weight: bold; color: #555;">Description (Optional)</label>
                     <textarea id="savingsDescription" placeholder="What are you saving for?"
                         style="width: 100%; border: 1px solid #ccc; padding: 10px; border-radius: 4px; box-sizing: border-box; margin-bottom: 5px; font-family: inherit; resize: vertical; min-height: 60px;"></textarea>
 
-                    <label style="font-weight: bold; color: #555;">Target Date</label>
-                    <input type="date" id="savingsDate" required>
+                    <label style="font-weight: bold; color: #555;">Target Date (Optional)</label>
+                    <input type="date" id="savingsDate">
                 </div>
                 <button type="submit" id="savingsSubmitBtn" style="margin-top: 10px;">Save Goal</button>
                 <button type="button" onclick="closeSavingsModal()" class="cancel-btn"
@@ -752,13 +751,13 @@
             <div id="detailContent" style="margin-bottom: 20px; font-size: 1.1rem; line-height: 1.6; color: #444;">
                 <div
                     style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
+                    <div id="detailGoalAmountContainer">
                         <span
                             style="display: block; font-size: 0.8rem; color: #888; font-weight: bold; text-transform: uppercase;">Goal
                             Amount</span>
                         <span id="detailGoalAmount" style="font-size: 1.2rem; font-weight: bold; color: #333;"></span>
                     </div>
-                    <div style="text-align: right;">
+                    <div id="detailGoalDateContainer" style="text-align: right;">
                         <span
                             style="display: block; font-size: 0.8rem; color: #888; font-weight: bold; text-transform: uppercase;">Target
                             Date</span>
@@ -1327,27 +1326,56 @@
 
             sorted.forEach(item => {
                 const saved = item.savedAmount || 0;
-                const percent = Math.min(100, Math.floor((saved / item.targetAmount) * 100));
+
+                // Determine if we have a target
+                const hasTarget = item.targetAmount && item.targetAmount > 0;
+                const percent = hasTarget ? Math.min(100, Math.floor((saved / item.targetAmount) * 100)) : 0;
+
+                // Date Display
+                let dateDisplay = '';
+                if (item.targetDate) {
+                    dateDisplay = `<span class="meta-info">Target: ${formatDate(item.targetDate)}</span>`;
+                }
 
                 const div = document.createElement('div');
                 div.className = 'expense-item savings-bar-item';
                 div.style.flexDirection = 'column';
                 div.style.alignItems = 'stretch';
                 div.onclick = () => openSavingsDetail(item.id);
-                div.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                            <div class="item-info">
-                                <strong style="font-size: 1.1rem; color: #28a745;">${item.name}</strong>
-                                <span class="meta-info">Target Date: ${formatDate(item.targetDate)}</span>
-                            </div>
-                            <div class="item-left" style="text-align: right;">
-                                <strong style="font-size: 1.2rem;">₱${formatCurrency(item.targetAmount)}</strong>
-                                <span style="display: block; font-size: 0.8rem; color: #888;">${percent}% Saved</span>
-                            </div>
-                        </div>
+
+                let rightSideContent = '';
+                if (hasTarget) {
+                    rightSideContent = `
+                        <strong style="font-size: 1.2rem;">₱${formatCurrency(item.targetAmount)}</strong>
+                        <span style="display: block; font-size: 0.8rem; color: #888;">${percent}% Saved</span>
+                     `;
+                } else {
+                    rightSideContent = `
+                        <strong style="font-size: 1.2rem; color: #28a745;">₱${formatCurrency(saved)}</strong>
+                        <span style="display: block; font-size: 0.8rem; color: #888;">Saved</span>
+                     `;
+                }
+
+                let progressBarHtml = '';
+                if (hasTarget) {
+                    progressBarHtml = `
                         <div style="background: #eee; height: 22.5px; border-radius: 11.25px; overflow: hidden;">
                             <div style="background: #28a745; width: ${percent}%; height: 100%; transition: width 0.3s;"></div>
                         </div>
+                    `;
+                }
+
+                div.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: ${hasTarget ? '8px' : '0'};">
+                            <div class="item-info">
+                                <strong style="font-size: 1.1rem; color: #333;">${item.name}</strong>
+                                ${dateDisplay}
+                            </div>
+                            <div class="item-left" style="text-align: right;">
+                                ${rightSideContent}
+                            </div>
+                        </div>
+                        ${progressBarHtml}
                     `;
                 savingsListDiv.appendChild(div);
             });
@@ -1357,8 +1385,23 @@
             const item = trackerData.savings.find(x => x.id === id);
             if (item) {
                 document.getElementById('detailGoalName').textContent = item.name;
-                document.getElementById('detailGoalAmount').textContent = '₱' + formatCurrency(item.targetAmount);
-                document.getElementById('detailGoalDate').textContent = formatDate(item.targetDate);
+                // Conditional Display for Details
+                const amtContainer = document.getElementById('detailGoalAmountContainer');
+                const dateContainer = document.getElementById('detailGoalDateContainer');
+
+                if (item.targetAmount && item.targetAmount > 0) {
+                    amtContainer.style.display = 'block';
+                    document.getElementById('detailGoalAmount').textContent = '₱' + formatCurrency(item.targetAmount);
+                } else {
+                    amtContainer.style.display = 'none';
+                }
+
+                if (item.targetDate) {
+                    dateContainer.style.display = 'block';
+                    document.getElementById('detailGoalDate').textContent = formatDate(item.targetDate);
+                } else {
+                    dateContainer.style.display = 'none';
+                }
                 document.getElementById('detailCurrentSaved').textContent = '₱' + formatCurrency(item.savedAmount || 0);
 
                 const descTextarea = document.getElementById('detailDescription');
@@ -1460,23 +1503,24 @@
             const description = savingsDescriptionInput.value;
             const targetDate = savingsDateInput.value;
 
-            if (name && targetAmount > 0 && targetDate) {
+            // Relaxed validation: only name is required
+            if (name) {
                 if (id) {
                     const item = trackerData.savings.find(x => x.id === id);
                     if (item) {
                         item.name = name;
-                        item.targetAmount = targetAmount;
+                        item.targetAmount = targetAmount || 0; // 0 implies no target
                         item.description = description;
-                        item.targetDate = targetDate;
+                        item.targetDate = targetDate || null; // null implies no date
                     }
                 } else {
                     if (!trackerData.savings) trackerData.savings = [];
                     trackerData.savings.unshift({
                         id: Date.now().toString(36) + Math.random().toString(36).substr(2),
                         name: name,
-                        targetAmount: targetAmount,
+                        targetAmount: targetAmount || 0,
                         description: description,
-                        targetDate: targetDate
+                        targetDate: targetDate || null
                     });
                 }
                 saveData();
